@@ -1,0 +1,26 @@
+{
+ "date": "2026-08-26",
+ "diffusion": {
+  "depose_le": "2026-08-26T08:15:48.660000+00:00",
+  "empreinte_miroir": "8d880d3c14e4e2be4e29b23299c1297d884d643c",
+  "genere_le": "2026-08-26T10:13:00",
+  "mesure": true
+ },
+ "domaines": {},
+ "fetched_at": "2026-08-26T13:48:47+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 535928,
+ "modifications": null,
+ "national": {
+  "creations": null,
+  "suppressions": null,
+  "total_bal": 535760
+ },
+ "par_type": {
+  "ORG": 80131,
+  "PER": 455629
+ },
+ "source_fingerprint": "76b4cac58b199ce02335e9c3fc8bfb4b700dc5ca705bc624e201fa9860268de4",
+ "source_timestamp": "2026-08-26T10:13:00",
+ "statut": "indetermine"
+}

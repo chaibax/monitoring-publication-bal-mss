@@ -1,0 +1,20 @@
+# --- Données à caractère personnel : jamais dans un dépôt public ---
+# Les extractions brutes contiennent des noms, prénoms, RPPS et adresses.
+# Une donnée commitée par erreur reste dans l'historique Git même après
+# suppression, et devient indexable. Voir docs/donnees-personnelles.md.
+*.txt
+!docs/**/*.txt
+*.zip
+*.parquet
+
+# --- État de référence : empreintes salées, cache d'exécution uniquement ---
+.cache/
+
+# --- Secrets ---
+.env
+
+# --- Outillage local ---
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
