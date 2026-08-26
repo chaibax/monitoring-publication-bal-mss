@@ -111,3 +111,16 @@ def test_une_journee_indeterminee_ne_porte_aucun_domaine():
     )
 
     assert enr["domaines"] == {}
+
+
+def test_le_delai_de_diffusion_tient_compte_du_fuseau():
+    """L'ANS horodate en heure de Paris, data.gouv en UTC. Comparer les deux
+    sans conversion donnerait deux heures de délai au lieu de trois minutes."""
+    from ingest.agregat import delai_diffusion
+
+    delai = delai_diffusion(
+        genere_le=datetime(2026, 8, 26, 10, 13),      # heure de Paris
+        depose_le="2026-08-26T08:15:48+00:00",        # UTC
+    )
+
+    assert delai == 168  # 2 min 48 s

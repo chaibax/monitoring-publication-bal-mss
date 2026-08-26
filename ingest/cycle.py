@@ -19,7 +19,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from ingest.agregat import agregat_quotidien, instantane_totaux
+from ingest.agregat import agregat_quotidien, delai_diffusion, instantane_totaux
 from ingest.etat import charger_etat, ecrire_etat
 from ingest.parse import lire_extraction
 from ingest.sources import (
@@ -135,6 +135,7 @@ def _diffusion(ans):
         "mesure": True,
         "genere_le": ans.horodatage_generation.isoformat(),
         "depose_le": miroir["depose_le"],
+        "delai_secondes": delai_diffusion(ans.horodatage_generation, miroir["depose_le"]),
         "empreinte_miroir": miroir["empreinte_sha1"],
     }
 

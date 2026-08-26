@@ -1,13 +1,14 @@
 {
  "date": "2026-08-26",
  "diffusion": {
+  "delai_secondes": 168,
   "depose_le": "2026-08-26T08:15:48.660000+00:00",
   "empreinte_miroir": "8d880d3c14e4e2be4e29b23299c1297d884d643c",
   "genere_le": "2026-08-26T10:13:00",
   "mesure": true
  },
  "domaines": {},
- "fetched_at": "2026-08-26T13:48:47+00:00",
+ "fetched_at": "2026-08-26T14:11:23+00:00",
  "lignes_ignorees": 0,
  "lignes_lues": 535928,
  "modifications": null,

@@ -8,12 +8,29 @@ d'empreinte. Le grain minimal exposé est le domaine de messagerie.
 """
 
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 from ingest.diff import comparer
 
 NOMINAL = "nominal"
 INTERROMPU = "interrompu"
 INDETERMINE = "indetermine"
+
+PARIS = ZoneInfo("Europe/Paris")
+"""L'ANS horodate ses fichiers en heure locale, data.gouv en UTC."""
+
+
+def delai_diffusion(genere_le, depose_le):
+    """Secondes écoulées entre la génération par l'ANS et le dépôt sur data.gouv.
+
+    C'est la mesure du maillon « diffusion » du bulletin météo. Une valeur
+    négative signalerait un dépôt antérieur à la génération, donc une
+    incohérence entre les deux sources : elle est rendue telle quelle plutôt
+    que corrigée en silence.
+    """
+    generation = genere_le.replace(tzinfo=PARIS)
+    depot = datetime.fromisoformat(depose_le)
+    return int((depot - generation).total_seconds())
 
 
 def agregat_quotidien(

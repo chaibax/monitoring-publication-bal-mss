@@ -1,0 +1,103 @@
+/* Ce que le DSFR ne couvre pas : pictogrammes météo, chronologie, histogramme,
+   matrice. Aucune couleur inventée : uniquement les jetons sémantiques du DSFR.
+   L'information ne repose jamais sur la seule couleur ni sur la seule forme. */
+
+.meteo-sprite { display: none; }
+
+/* --- Bulletin météo : trois maillons --- */
+.meteo-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+.maillon {
+  border: 1px solid var(--border-default-grey);
+  border-left: 4px solid var(--border-plain-grey);
+  padding: 1rem;
+  background: var(--background-default-grey);
+}
+.maillon__titre {
+  font-size: .75rem; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--text-mention-grey); margin: 0 0 .5rem;
+}
+.maillon__etat { display: flex; align-items: center; gap: .75rem; }
+.maillon__etat svg {
+  width: 2.5rem; height: 2.5rem; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.maillon__etat svg .trait-fin { stroke-width: 1.5; }
+.maillon__nom { font-weight: 700; font-size: 1.05rem; line-height: 1.2; }
+.maillon__justification {
+  font-size: .8rem; color: var(--text-mention-grey);
+  margin: .5rem 0 0; line-height: 1.35;
+}
+/* La couleur double le pictogramme, elle ne le remplace pas. */
+.etat-soleil       { color: var(--text-default-success); border-left-color: var(--border-plain-success); }
+.etat-voile        { color: var(--text-default-warning); border-left-color: var(--border-plain-warning); }
+.etat-nuage        { color: var(--text-mention-grey);    border-left-color: var(--border-plain-grey); }
+.etat-pluie        { color: var(--text-default-error);   border-left-color: var(--border-plain-error); }
+.etat-brouillard   { color: var(--text-mention-grey);    border-left-color: var(--border-plain-info); }
+.etat-indisponible { color: var(--text-disabled-grey);   border-left-color: var(--border-disabled-grey); }
+
+/* --- Chronologie --- */
+.chrono-ligne { margin-bottom: .75rem; }
+.chrono-titre {
+  font-size: .75rem; color: var(--text-mention-grey);
+  margin: 0 0 .25rem; text-transform: uppercase; letter-spacing: .04em;
+}
+.chrono-bande { display: flex; gap: 2px; flex-wrap: wrap; }
+.chrono-jour {
+  width: 1.5rem; height: 1.5rem; border: 1px solid var(--border-default-grey);
+  display: flex; align-items: center; justify-content: center;
+}
+.chrono-jour svg {
+  width: 1rem; height: 1rem; fill: none; stroke: currentColor;
+  stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+}
+.chrono-jour.absent {
+  background: var(--background-contrast-error);
+  color: var(--text-default-error);
+}
+/* La forme porte l'information à égalité avec la couleur : un jour sans
+   fichier reste distinguable en nuances de gris et pour les principales
+   formes de daltonisme. */
+.chrono-jour.etat-absent svg { stroke-width: 3.5; }
+.chrono-jour.hachure {
+  background-image: repeating-linear-gradient(45deg,
+    transparent, transparent 3px,
+    var(--border-default-grey) 3px, var(--border-default-grey) 4px);
+}
+
+/* --- Histogramme --- */
+.histo { display: flex; align-items: flex-end; gap: 2px; height: 11rem;
+  border-bottom: 1px solid var(--border-plain-grey); padding-top: .5rem; }
+.histo-barre { flex: 1 1 0; min-width: 3px; background: var(--background-action-high-blue-france); }
+.histo-barre.nulle { height: 2px; background: var(--border-plain-grey); }
+.histo-barre.manquante {
+  height: 100%; background: none;
+  background-image: repeating-linear-gradient(45deg,
+    transparent, transparent 3px,
+    var(--border-default-grey) 3px, var(--border-default-grey) 4px);
+}
+.histo-vide {
+  border: 1px dashed var(--border-default-grey); padding: 2rem 1rem;
+  text-align: center; color: var(--text-mention-grey);
+}
+
+/* --- Matrice et tableau par domaine --- */
+.tableau-domaines { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.tableau-domaines th, .tableau-domaines td {
+  padding: .35rem .5rem; border-bottom: 1px solid var(--border-default-grey);
+  text-align: left;
+}
+.tableau-domaines td.nombre, .tableau-domaines th.nombre { text-align: right; font-variant-numeric: tabular-nums; }
+.tableau-domaines tr.regroupement td { font-style: italic; color: var(--text-mention-grey); }
+.enveloppe-defilante { overflow-x: auto; max-height: 32rem; overflow-y: auto; }
+
+.note-lecture { color: var(--text-mention-grey); max-width: 62ch; }
+.methode p { max-width: 78ch; }
+.tuile-cle { border: 1px solid var(--border-default-grey); padding: 1rem; height: 100%; }
+.tuile-cle__valeur { font-size: 1.75rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tuile-cle__libelle { font-size: .8rem; color: var(--text-mention-grey); margin-top: .25rem; }
+.tuile-cle__source { font-size: .7rem; color: var(--text-disabled-grey); margin-top: .5rem; }
