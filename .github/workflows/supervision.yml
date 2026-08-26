@@ -101,8 +101,10 @@ jobs:
           git commit -m "Agrégats du ${{ needs.sonde.outputs.horodatage }}"
           git push
 
+      # `secrets` est lisible dans un `if` de step, contrairement au `env`
+      # défini sur ce même step, qui ne l'est pas.
       - name: Déployer le site
-        if: ${{ env.NETLIFY_AUTH_TOKEN != '' }}
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' }}
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}

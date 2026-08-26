@@ -46,17 +46,24 @@ def sel():
     return valeur.encode("utf-8")
 
 
-def dernier_agregat():
-    """Le plus récent enregistrement quotidien déjà produit, s'il existe."""
-    connus = sorted(DOSSIER_AGREGATS.glob("*.json"))
-    return json.loads(connus[-1].read_text()) if connus else None
+def agregat_precedent(jour):
+    """Le plus récent enregistrement quotidien antérieur à `jour`.
+
+    Strictement antérieur : rejouer une journée déjà traitée comparerait
+    sinon le fichier à sa propre empreinte, et la couche 1 conclurait à une
+    republication à l'identique sur une chaîne parfaitement saine.
+    """
+    anterieurs = [c for c in sorted(DOSSIER_AGREGATS.glob("*.json"))
+                  if c.stem < jour.isoformat()]
+    return json.loads(anterieurs[-1].read_text()) if anterieurs else None
 
 
 def sonde():
     """Couche 0 : la source produit-elle, et est-ce nouveau ?"""
     ans = sonder_ans()
-    precedent = dernier_agregat()
-    connu = precedent["source_timestamp"] if precedent else None
+    connus = sorted(DOSSIER_AGREGATS.glob("*.json"))
+    dernier = json.loads(connus[-1].read_text()) if connus else None
+    connu = dernier["source_timestamp"] if dernier else None
     horodatage = ans.horodatage_generation.isoformat()
 
     return {
@@ -77,7 +84,7 @@ def traitement():
         archive = telecharger_ans(Path(travail) / ans.nom_fichier)
         observation = lire_extraction(lignes_de_l_archive(archive), sel=sel())
 
-    precedent = dernier_agregat()
+    precedent = agregat_precedent(jour)
     enregistrement = agregat_quotidien(
         jour=jour,
         observation=observation,
