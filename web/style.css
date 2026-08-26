@@ -41,12 +41,25 @@
 .etat-indisponible { color: var(--text-disabled-grey);   border-left-color: var(--border-disabled-grey); }
 
 /* --- Chronologie --- */
-.chrono-ligne { margin-bottom: .75rem; }
+.chrono-ligne { margin-bottom: 1rem; }
 .chrono-titre {
   font-size: .75rem; color: var(--text-mention-grey);
   margin: 0 0 .25rem; text-transform: uppercase; letter-spacing: .04em;
 }
 .chrono-bande { display: flex; gap: 2px; flex-wrap: wrap; }
+.chrono-col { display: flex; flex-direction: column; align-items: center; }
+.chrono-etiquette {
+  font-size: .625rem; line-height: 1.4; color: var(--text-mention-grey);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.chrono-col.debut-de-mois .chrono-etiquette {
+  font-weight: 700; color: var(--text-title-grey);
+}
+.chrono-mois { display: block; font-size: .5625rem; line-height: 1.1; }
+/* Le premier jour du mois porte un repère, pour situer une série de croix
+   sans avoir à compter les cases. */
+.chrono-col.debut-de-mois .chrono-jour { border-left: 2px solid var(--text-title-grey); }
+.chrono-periode { text-transform: none; letter-spacing: 0; font-weight: 400; }
 .chrono-jour {
   width: 1.5rem; height: 1.5rem; border: 1px solid var(--border-default-grey);
   display: flex; align-items: center; justify-content: center;

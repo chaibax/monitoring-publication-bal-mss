@@ -20,3 +20,6 @@ __pycache__/
 .pytest_cache/
 web/dsfr/
 web/data/
+
+# Local Netlify folder
+.netlify

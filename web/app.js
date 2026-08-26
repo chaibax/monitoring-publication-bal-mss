@@ -104,15 +104,31 @@ function derniersJours(n, finIso) {
   return jours;
 }
 
+const MOIS_COURT = new Intl.DateTimeFormat("fr-FR", { month: "short" });
+
 function bandeChrono(titre, jours, cellule) {
-  const cases = jours.map((j) => {
+  // L'étiquette est dans la même colonne que la case : au retour à la ligne
+  // sur petit écran, la date reste collée au jour qu'elle désigne.
+  const colonnes = jours.map((j) => {
     const { classe, etat, texte } = cellule(j);
     const pic = etat ? `<svg aria-hidden="true"><use href="#${ETATS[etat].pic}"></use></svg>` : "";
-    return `<div class="chrono-jour ${classe} ${etat ? "etat-" + etat : ""}"
-      title="${jourDe(j)} — ${texte}"><span class="fr-sr-only">${jourDe(j)} : ${texte}</span>${pic}</div>`;
+    const d = new Date(j + "T12:00:00");
+    const debutDeMois = d.getDate() === 1;
+    // Le mois passe à la ligne : une étiquette large déformerait la grille
+    // et ferait déborder la bande sur deux rangs.
+    const etiquette = debutDeMois
+      ? `1<span class="chrono-mois">${MOIS_COURT.format(d).replace(".", "")}</span>`
+      : d.getDate();
+    return `<div class="chrono-col${debutDeMois ? " debut-de-mois" : ""}">
+      <div class="chrono-jour ${classe} ${etat ? "etat-" + etat : ""}"
+        title="${jourDe(j)} — ${texte}"><span class="fr-sr-only">${jourDe(j)} : ${texte}</span>${pic}</div>
+      <span class="chrono-etiquette" aria-hidden="true">${etiquette}</span>
+    </div>`;
   }).join("");
-  return `<div class="chrono-ligne"><p class="chrono-titre">${titre}</p>
-    <div class="chrono-bande">${cases}</div></div>`;
+  const debut = jourDe(jours[0]), fin = jourDe(jours[jours.length - 1]);
+  return `<div class="chrono-ligne">
+    <p class="chrono-titre">${titre} <span class="chrono-periode">du ${debut} au ${fin}</span></p>
+    <div class="chrono-bande">${colonnes}</div></div>`;
 }
 
 function rendreChronologie(calendrier, agregats, aujourdhui) {
