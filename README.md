@@ -52,6 +52,25 @@ python -m ingest.cycle traitement  # cycle complet, 20 Mo
 
 Tests : `python -m pytest`
 
+## Automatisation
+
+| Tâche | Cadence | Rôle |
+|---|---|---|
+| `Supervision` | 03:10, 07:10, 11:10, 15:10, 19:10 UTC | sonde les en-têtes, traite si la source a bougé, publie et déploie |
+| `Vigie de l'outil` | 09:40 UTC | échoue si plus aucun agrégat depuis 48 h |
+
+Secrets et variables attendus dans le dépôt :
+
+| Nom | Type | Nécessaire à |
+|---|---|---|
+| `MONITORING_SEL` | secret | empreintes salées des adresses |
+| `NETLIFY_AUTH_TOKEN` | secret | redéploiement du site |
+| `NETLIFY_SITE_ID` | variable | redéploiement du site |
+| `SLACK_WEBHOOK` | secret, facultatif | alerte de la vigie |
+
+Sans `NETLIFY_AUTH_TOKEN`, les agrégats sont publiés dans Git mais le site
+n'est pas redéployé ; la tâche le signale par un avertissement.
+
 ## Licence
 
 Code sous licence MIT. Données sources sous

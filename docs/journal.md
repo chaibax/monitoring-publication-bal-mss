@@ -70,6 +70,31 @@ Le regroupement retire les deux tiers du bruit de la matrice sans rien retranche
 
 **Renvoyé en v2.** La détection de migration — un domaine qui disparaît pendant qu'un autre apparaît avec la même population — est faisable en comparant les empreintes salées des parties locales des adresses, qui survivent généralement à un changement de domaine. Hors périmètre v1 : le gain est faible tant que les cas se comptent sur les doigts d'une main.
 
+### Décision 5 — Deux jobs dans une tâche, plutôt que deux tâches distinctes
+
+Le §6.1 du brief prévoyait deux workflows séparés. L'implémentation en retient
+un seul, avec deux jobs enchaînés par `needs` et une condition.
+
+Le motif du brief est respecté à la lettre — « et non un seul job lourd
+répété » : la sonde interroge les en-têtes cinq fois par jour sans transférer
+de contenu, et le traitement ne part que si l'horodatage de génération a
+bougé, soit une fois par jour en rythme nominal. Deux jobs suffisent à cela,
+et évitent le déclenchement croisé d'un workflow par un autre, qui exige un
+jeton supplémentaire et rend le lien entre sonde et traitement invisible dans
+l'historique d'exécution. Les plafonds de durée restent distincts, trois
+minutes pour la sonde et quinze pour le traitement.
+
+### Décision 6 — Le déploiement passe par un jeton, pas par un liage OAuth
+
+Le site n'est pas relié au dépôt côté Netlify. C'est la tâche planifiée qui
+appelle `netlify deploy` avec un jeton en secret de dépôt. Cela évite une
+autorisation croisée entre GitHub et Netlify et garde tout le déclenchement
+dans le dépôt, donc lisible par n'importe qui.
+
+Conséquence à connaître : tant que le secret `NETLIFY_AUTH_TOKEN` est absent,
+les agrégats sont publiés dans Git mais le site n'est pas redéployé. La tâche
+émet alors un avertissement explicite plutôt que de sauter l'étape en silence.
+
 ---
 
 ## Surprises sur les données
