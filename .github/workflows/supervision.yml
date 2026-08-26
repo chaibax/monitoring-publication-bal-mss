@@ -109,8 +109,13 @@ jobs:
       - name: Déployer le site
         if: env.NETLIFY_AUTH_TOKEN != ''
         # Le projet est désigné explicitement : le dépôt n'est pas lié côté
-        # Netlify, et la variable d'environnement seule ne suffit pas à la CLI.
-        run: npx --yes netlify-cli@26 deploy --build --prod --site "$NETLIFY_SITE_ID"
+        # Netlify. La construction est le comportement par défaut en v26,
+        # il n'y a plus de drapeau --build.
+        run: |
+          echo "Compte associé au jeton :"
+          npx --yes netlify-cli@26 api listSites --data '{}' \
+            | python3 -c "import json,sys,os; s=json.load(sys.stdin); cible=os.environ['NETLIFY_SITE_ID']; print(f'  {len(s)} projet(s) visible(s)'); [print('  -', p['id'], p['name'], '<<< cible' if p['id']==cible else '') for p in s[:10]]"
+          npx --yes netlify-cli@26 deploy --prod --site "$NETLIFY_SITE_ID"
 
       - name: Signaler l'absence de jeton de déploiement
         if: env.NETLIFY_AUTH_TOKEN == ''
