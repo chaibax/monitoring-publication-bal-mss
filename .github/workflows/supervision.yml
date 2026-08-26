@@ -112,9 +112,10 @@ jobs:
         # Netlify. La construction est le comportement par défaut en v26,
         # il n'y a plus de drapeau --build.
         run: |
-          echo "Compte associé au jeton :"
+          # Diagnostic volontairement muet sur les noms de projet : les
+          # journaux d'exécution d'un dépôt public sont lisibles par tous.
           npx --yes netlify-cli@26 api listSites --data '{}' \
-            | python3 -c "import json,sys,os; s=json.load(sys.stdin); cible=os.environ['NETLIFY_SITE_ID']; print(f'  {len(s)} projet(s) visible(s)'); [print('  -', p['id'], p['name'], '<<< cible' if p['id']==cible else '') for p in s[:10]]"
+            | python3 -c "import json,sys,os; s=json.load(sys.stdin); cible=os.environ['NETLIFY_SITE_ID']; visible=any(p['id']==cible for p in s); print(f'Jeton : {len(s)} projet(s) accessible(s), projet cible {\"visible\" if visible else \"INVISIBLE — le jeton appartient probablement à un autre compte Netlify\"}.')"
           npx --yes netlify-cli@26 deploy --prod --site "$NETLIFY_SITE_ID"
 
       - name: Signaler l'absence de jeton de déploiement
