@@ -108,7 +108,9 @@ jobs:
 
       - name: Déployer le site
         if: env.NETLIFY_AUTH_TOKEN != ''
-        run: npx --yes netlify-cli@26 deploy --build --prod
+        # Le projet est désigné explicitement : le dépôt n'est pas lié côté
+        # Netlify, et la variable d'environnement seule ne suffit pas à la CLI.
+        run: npx --yes netlify-cli@26 deploy --build --prod --site "$NETLIFY_SITE_ID"
 
       - name: Signaler l'absence de jeton de déploiement
         if: env.NETLIFY_AUTH_TOKEN == ''
