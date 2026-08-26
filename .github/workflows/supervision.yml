@@ -62,6 +62,11 @@ jobs:
     if: needs.sonde.outputs.traitement_requis == 'true' || inputs.forcer
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Au niveau du job : un `env` de job est lisible dans le `if` d'un step,
+    # ce que ni `secrets` ni un `env` défini sur le step lui-même ne sont.
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -101,11 +106,10 @@ jobs:
           git commit -m "Agrégats du ${{ needs.sonde.outputs.horodatage }}"
           git push
 
-      # `secrets` est lisible dans un `if` de step, contrairement au `env`
-      # défini sur ce même step, qui ne l'est pas.
       - name: Déployer le site
-        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' }}
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+        if: env.NETLIFY_AUTH_TOKEN != ''
         run: npx --yes netlify-cli@26 deploy --build --prod
+
+      - name: Signaler l'absence de jeton de déploiement
+        if: env.NETLIFY_AUTH_TOKEN == ''
+        run: echo "::warning::NETLIFY_AUTH_TOKEN absent — les agrégats sont publiés, le site n'est pas redéployé." 
