@@ -5,6 +5,7 @@
 
 const SEUIL_REGROUPEMENT = 30;   // décision 3 : voir docs/journal.md
 const JOURS_CHRONO = 30;
+const PEREMPTION_HEURES = 48;  // au-delà, l'outil est réputé en panne
 
 const ETATS = {
   soleil:       { pic: "pic-soleil",       nom: "Soleil" },
@@ -51,9 +52,20 @@ function maillon(titre, etat, justification) {
   </div>`;
 }
 
+function ageHeures(dernier) {
+  return (Date.now() - new Date(dernier.source_timestamp + "+02:00")) / 3600000;
+}
+
 function etatAlimentation(dernier) {
   if (!dernier) {
     return ["brouillard", "Aucun relevé disponible. L'outil est en difficulté, ce qui ne dit rien de la chaîne."];
+  }
+  // Sans ce contrôle, une panne de l'outil laisserait la page afficher
+  // indéfiniment le dernier état favorable qu'il a connu.
+  const age = ageHeures(dernier);
+  if (age > PEREMPTION_HEURES) {
+    return ["brouillard", `Aucun relevé depuis <b>${Math.floor(age / 24)} jours</b>.
+      L'outil ne produit plus&nbsp;: cet écran ne dit rien de l'état réel de la chaîne.`];
   }
   const heure = dernier.source_timestamp.slice(11, 16);
   if (dernier.statut === "indetermine") {
@@ -280,11 +292,19 @@ async function demarrer() {
   const dernier = agregats[aujourdhui] || null;
 
   $("badge-date").textContent = `Données au ${jourDe(aujourdhui)}`;
-  $("fraicheur").innerHTML = dernier
-    ? `Dernière production effective de la chaîne&nbsp;: <b>${jourDe(aujourdhui)} à
-       ${dernier.source_timestamp.slice(11, 16)}</b>, heure de génération par l'ANS.
-       Relevé effectué par l'outil le ${jourDe(dernier.fetched_at.slice(0, 10))}.`
-    : `<b>Aucun relevé de l'outil.</b> L'âge des données est inconnu.`;
+  if (dernier) {
+    const h = ageHeures(dernier);
+    const age = h < 24 ? `il y a ${Math.max(0, Math.round(h))} h`
+                       : `il y a ${Math.floor(h / 24)} jours`;
+    $("fraicheur").innerHTML = `Dernière production effective de la chaîne&nbsp;:
+      <b>${jourDe(aujourdhui)} à ${dernier.source_timestamp.slice(11, 16)}</b>,
+      heure de génération par l'ANS — <b>${age}</b>.
+      ${h > PEREMPTION_HEURES
+        ? `<span class="fr-badge fr-badge--error fr-badge--sm fr-ml-1w">Données périmées</span>`
+        : ""}`;
+  } else {
+    $("fraicheur").innerHTML = `<b>Aucun relevé de l'outil.</b> L'âge des données est inconnu.`;
+  }
 
   $("bulletin").innerHTML =
     maillon("Alimentation et publication", ...etatAlimentation(dernier)) +

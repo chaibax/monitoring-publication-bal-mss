@@ -1,0 +1,60 @@
+# Vigie de l'outil lui-même.
+#
+# Le pire résultat possible serait qu'une panne de l'outil soit prise pour
+# une panne de la chaîne MSSanté. Cette tâche échoue — et GitHub prévient
+# alors le propriétaire du dépôt — dès que plus aucun agrégat n'a été produit
+# depuis 48 heures. Elle couvre aussi bien une source injoignable qu'une
+# désactivation des tâches planifiées après soixante jours d'inactivité.
+
+name: Vigie de l'outil
+
+on:
+  schedule:
+    - cron: '40 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  fraicheur:
+    name: Âge des agrégats
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Vérifier que l'outil produit encore
+        id: age
+        run: |
+          python - <<'PY'
+          import glob, os, sys
+          from datetime import date, datetime
+          jours = sorted(os.path.basename(f)[:-5] for f in glob.glob("data/daily/*.json"))
+          if not jours:
+              sys.exit("AUCUN agrégat dans data/daily — l'outil n'a jamais produit.")
+          age = (date.today() - date.fromisoformat(jours[-1])).days
+          print(f"Dernier agrégat : {jours[-1]} ({age} j)")
+          if age > 2:
+              sys.exit(
+                  f"ALERTE — aucun agrégat depuis {age} jours (dernier : {jours[-1]}). "
+                  "Vérifier les tâches planifiées, qui se désactivent après soixante "
+                  "jours d'inactivité sur un dépôt public, et la disponibilité de la source."
+              )
+          PY
+
+      - name: Prévenir sur Slack
+        if: failure() && env.SLACK_WEBHOOK != ''
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          curl -sS -X POST -H 'Content-type: application/json' --data "$(python - <<'PY'
+          import json, os
+          depot = os.environ.get("GITHUB_REPOSITORY", "")
+          execution = os.environ.get("GITHUB_RUN_ID", "")
+          print(json.dumps({"text":
+              ":warning: *Supervision BAL MSSanté* — l'outil ne produit plus d'agrégat "
+              "depuis plus de 48 heures. Règle déclenchée : fraîcheur des agrégats. "
+              f"Détail : https://github.com/{depot}/actions/runs/{execution}"}))
+          PY
+          )" "$SLACK_WEBHOOK"

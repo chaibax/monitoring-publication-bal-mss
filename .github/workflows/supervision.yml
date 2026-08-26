@@ -1,0 +1,109 @@
+# Supervision de la chaîne de publication des BAL MSSanté.
+#
+# Deux jobs, pas un seul job lourd répété : la sonde ne transfère aucun
+# contenu et tourne cinq fois par jour ; le traitement ne se déclenche que
+# si l'horodatage de génération a bougé, soit une fois par jour en rythme
+# nominal. C'est autant de charge en moins sur les serveurs de l'ANS.
+#
+# L'heure d'exécution n'est jamais l'horodatage de référence : c'est celui
+# du fichier source qui fait foi.
+
+name: Supervision
+
+on:
+  schedule:
+    # 03:10, 07:10, 11:10, 15:10 et 19:10 UTC. Jamais à l'heure ronde : les
+    # tâches planifiées sont retardées en période de charge, surtout à :00.
+    # La génération par l'ANS se situe le plus souvent entre 02:00 et 04:00 UTC.
+    - cron: '10 3,7,11,15,19 * * *'
+  workflow_dispatch:
+    inputs:
+      forcer:
+        description: "Lancer le traitement complet même sans changement de la source"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: supervision
+  cancel-in-progress: false
+
+jobs:
+  sonde:
+    name: Sonde de disponibilité
+    runs-on: ubuntu-latest
+    timeout-minutes: 3   # sans plafond explicite, GitHub laisse tourner six heures
+    outputs:
+      traitement_requis: ${{ steps.sonder.outputs.traitement_requis }}
+      horodatage: ${{ steps.sonder.outputs.horodatage }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Interroger les en-têtes de la source
+        id: sonder
+        run: |
+          python -m ingest.cycle sonde > sonde.json
+          cat sonde.json
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          s = json.load(open("sonde.json"))
+          print(f"traitement_requis={str(s['traitement_requis']).lower()}")
+          print(f"horodatage={s['horodatage_generation']}")
+          PY
+
+  traitement:
+    name: Traitement complet
+    needs: sonde
+    if: needs.sonde.outputs.traitement_requis == 'true' || inputs.forcer
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # L'état de référence ne va jamais dans Git : il contient les empreintes
+      # salées de la veille. Le cache l'évince au bout de sept jours sans
+      # consultation ; le cycle repart alors de zéro et marque la journée
+      # indéterminée, jamais en anomalie.
+      - name: Restaurer l'état de référence
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: etat-${{ github.run_id }}
+          restore-keys: etat-
+
+      - name: Cycle complet
+        env:
+          MONITORING_SEL: ${{ secrets.MONITORING_SEL }}
+        run: python -m ingest.cycle traitement
+
+      # Une revue humaine ne suffit pas sur un dépôt public alimenté par un
+      # robot : ce qui est commité l'est définitivement.
+      - name: Contrôle avant commit
+        run: python -m ingest.garde_fou data/daily/*.json data/snapshots/*.json
+
+      - name: Publier les agrégats
+        run: |
+          git config user.name  "robot-supervision"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "Aucun agrégat nouveau — rien à publier."
+            exit 0
+          fi
+          git commit -m "Agrégats du ${{ needs.sonde.outputs.horodatage }}"
+          git push
+
+      - name: Déployer le site
+        if: ${{ env.NETLIFY_AUTH_TOKEN != '' }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+        run: npx --yes netlify-cli@26 deploy --build --prod
