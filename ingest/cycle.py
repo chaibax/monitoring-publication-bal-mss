@@ -75,6 +75,20 @@ def sonde():
     }
 
 
+def etat_de_reference(jour, etat_charge):
+    """L'état de la veille, ou None s'il n'y a rien à quoi comparer.
+
+    Un état portant le jour traité vient d'un cycle rejoué sur la même
+    source. Le comparer reviendrait à comparer l'observation à elle-même :
+    zéro mouvement, et l'outil annoncerait « aucune adresse publiée » sans
+    avoir rien mesuré. Mieux vaut une journée indéterminée qu'un chiffre faux.
+    """
+    if etat_charge is None:
+        return None
+    jour_de_l_etat, empreintes = etat_charge
+    return None if jour_de_l_etat >= jour else empreintes
+
+
 def traitement():
     """Cycle complet : télécharger, lire, comparer, écrire."""
     ans = sonder_ans()
@@ -88,7 +102,7 @@ def traitement():
     enregistrement = agregat_quotidien(
         jour=jour,
         observation=observation,
-        etat_veille=charger_etat(CHEMIN_ETAT, sel=sel()),
+        etat_veille=etat_de_reference(jour, charger_etat(CHEMIN_ETAT, sel=sel())),
         empreinte_veille=precedent["source_fingerprint"] if precedent else None,
         horodatage_source=ans.horodatage_generation,
         diffusion=_diffusion(ans),
@@ -103,7 +117,7 @@ def traitement():
     instantane = _ecrire_instantane_si_necessaire(jour, observation, enregistrement)
 
     CHEMIN_ETAT.parent.mkdir(parents=True, exist_ok=True)
-    ecrire_etat(CHEMIN_ETAT, observation.empreintes_par_domaine, sel=sel())
+    ecrire_etat(CHEMIN_ETAT, observation.empreintes_par_domaine, sel=sel(), jour=jour)
 
     return {
         "ecrit": str(destination.relative_to(RACINE)),

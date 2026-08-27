@@ -11,11 +11,12 @@ Format binaire, compact et sans ambiguïté : environ 4,3 Mo pour les
 import gzip
 import hashlib
 import struct
+from datetime import date
 from collections import defaultdict
 
 from ingest.parse import TAILLE_EMPREINTE
 
-SIGNATURE = b"MPBM\x02"
+SIGNATURE = b"MPBM\x03"
 TAILLE_MARQUE_SEL = 8
 
 
@@ -25,11 +26,16 @@ def _marque_du_sel(sel):
 ENTETE_DOMAINE = struct.Struct("!HI")  # longueur du nom, nombre d'empreintes
 
 
-def ecrire_etat(chemin, etat, sel):
-    """Écrit `{domaine: set(empreintes)}` sous forme compacte et compressée."""
+def ecrire_etat(chemin, etat, sel, jour):
+    """Écrit `{domaine: set(empreintes)}` sous forme compacte et compressée.
+
+    `jour` est la journée que cet état décrit. Il est relu pour éviter de
+    comparer une observation à elle-même.
+    """
     with gzip.open(chemin, "wb") as sortie:
         sortie.write(SIGNATURE)
         sortie.write(_marque_du_sel(sel))
+        sortie.write(jour.isoformat().encode("ascii"))
         for domaine, empreintes in sorted(etat.items()):
             nom = domaine.encode("utf-8")
             sortie.write(ENTETE_DOMAINE.pack(len(nom), len(empreintes)))
@@ -39,7 +45,7 @@ def ecrire_etat(chemin, etat, sel):
 
 
 def charger_etat(chemin, sel):
-    """Relit un état. Renvoie None s'il est absent ou inutilisable.
+    """Relit un état. Renvoie `(jour, etat)`, ou None s'il est inutilisable.
 
     Le cache GitHub évince toute entrée non consultée pendant sept jours,
     et le sel peut avoir été renouvelé : ces deux cas sont nominaux, pas des
@@ -52,11 +58,12 @@ def charger_etat(chemin, sel):
                 return None
             if entree.read(TAILLE_MARQUE_SEL) != _marque_du_sel(sel):
                 return None  # sel renouvelé : les empreintes ne sont plus comparables
+            jour = date.fromisoformat(entree.read(10).decode("ascii"))
             etat = defaultdict(set)
             while True:
                 entete = entree.read(ENTETE_DOMAINE.size)
                 if not entete:
-                    return dict(etat)
+                    return jour, dict(etat)
                 taille_nom, nombre = ENTETE_DOMAINE.unpack(entete)
                 domaine = entree.read(taille_nom).decode("utf-8")
                 brut = entree.read(nombre * TAILLE_EMPREINTE)

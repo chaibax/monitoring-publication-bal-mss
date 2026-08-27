@@ -8,13 +8,13 @@
   "mesure": true
  },
  "domaines": {},
- "fetched_at": "2026-08-26T14:57:01+00:00",
+ "fetched_at": "2026-08-27T06:10:31+00:00",
  "lignes_ignorees": 0,
  "lignes_lues": 535928,
  "modifications": null,
  "national": {
-  "creations": 0,
-  "suppressions": 0,
+  "creations": null,
+  "suppressions": null,
   "total_bal": 535760
  },
  "par_type": {
@@ -23,5 +23,5 @@
  },
  "source_fingerprint": "76b4cac58b199ce02335e9c3fc8bfb4b700dc5ca705bc624e201fa9860268de4",
  "source_timestamp": "2026-08-26T10:13:00",
- "statut": "nominal"
+ "statut": "indetermine"
 }

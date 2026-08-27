@@ -33,3 +33,14 @@ def test_sans_aucun_agregat_anterieur_il_n_y_a_pas_de_reference(tmp_path, monkey
     monkeypatch.setattr(cycle, "DOSSIER_AGREGATS", tmp_path)
 
     assert cycle.agregat_precedent(date(2026, 8, 26)) is None
+
+
+def test_un_etat_du_jour_meme_ne_sert_pas_de_reference(tmp_path, monkeypatch):
+    """Rejouer un cycle sur la même source comparerait l'observation à
+    elle-même : zéro mouvement, et l'outil annoncerait « aucune adresse
+    publiée » sans avoir rien mesuré. La journée doit rester indéterminée."""
+    monkeypatch.setattr(cycle, "DOSSIER_AGREGATS", tmp_path)
+
+    assert cycle.etat_de_reference(date(2026, 8, 26), (date(2026, 8, 26), {"a": set()})) is None
+    assert cycle.etat_de_reference(date(2026, 8, 26), (date(2026, 8, 25), {"a": set()})) == {"a": set()}
+    assert cycle.etat_de_reference(date(2026, 8, 26), None) is None
