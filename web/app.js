@@ -206,7 +206,11 @@ function rendreDomaines(instantane, dernier) {
 
   const lignes = publies.map(([d, n]) => {
     const m = mouvements[d];
-    return `<tr><td>${d}</td><td class="nombre">${nf.format(n)}</td>
+    // Le total du jour prime sur celui de l'instantané, qui date du dernier
+    // point de resynchronisation : sans cela la colonne des volumes et celle
+    // des mouvements décriraient deux journées différentes.
+    const total = m ? m[0] : n;
+    return `<tr><td>${d}</td><td class="nombre">${nf.format(total)}</td>
       <td class="nombre">${m ? nf.format(m[1]) : (dernier && dernier.statut !== "indetermine" ? "0" : "—")}</td>
       <td class="nombre">${m ? nf.format(m[2]) : (dernier && dernier.statut !== "indetermine" ? "0" : "—")}</td></tr>`;
   }).join("");
