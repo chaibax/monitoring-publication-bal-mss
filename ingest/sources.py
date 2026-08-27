@@ -39,7 +39,7 @@ def _contexte_igc_sante():
     return ssl.create_default_context(cafile=str(CA_IGC_SANTE))
 
 
-def _contexte_public():
+def contexte_public():
     """Contexte TLS pour les hôtes à autorité publique — data.gouv, l'API FHIR.
 
     Le magasin du système suffit sur un exécuteur correctement configuré.
@@ -118,7 +118,7 @@ def lignes_de_l_archive(chemin):
 
 def sonder_datagouv(url=URL_METADONNEES_DATAGOUV):
     """Témoin de diffusion : quand le miroir a-t-il reçu le fichier ?"""
-    with urllib.request.urlopen(url, timeout=DELAI, context=_contexte_public()) as reponse:
+    with urllib.request.urlopen(url, timeout=DELAI, context=contexte_public()) as reponse:
         jeu = json.load(reponse)
     ressource = jeu["resources"][0]
     extras = ressource.get("extras", {})
@@ -148,5 +148,5 @@ def signal_de_vie_annuaire(cle, debut, fin, ressource="PractitionerRole"):
     requete = urllib.request.Request(
         f"{URL_FHIR}/{ressource}?{parametres}", headers={"ESANTE-API-KEY": cle}
     )
-    with urllib.request.urlopen(requete, timeout=DELAI, context=_contexte_public()) as reponse:
+    with urllib.request.urlopen(requete, timeout=DELAI, context=contexte_public()) as reponse:
         return json.load(reponse).get("total")

@@ -17,12 +17,20 @@ import json
 import os
 import sys
 import tempfile
+from datetime import date
 from pathlib import Path
 
 from ingest.agregat import agregat_quotidien, delai_diffusion, instantane_totaux
 from ingest.etat import charger_etat, ecrire_etat
 from ingest.parse import lire_extraction
+from ingest.reconstitution import (
+    calendrier_depuis_evenements,
+    fusionner_calendriers,
+    interruptions,
+    telecharger_evenements,
+)
 from ingest.sources import (
+    contexte_public,
     lignes_de_l_archive,
     sonder_ans,
     sonder_datagouv,
@@ -32,6 +40,7 @@ from ingest.sources import (
 RACINE = Path(__file__).resolve().parent.parent
 DOSSIER_AGREGATS = RACINE / "data" / "daily"
 DOSSIER_INSTANTANES = RACINE / "data" / "snapshots"
+CHEMIN_CALENDRIER = RACINE / "data" / "calendrier-publications.json"
 CHEMIN_ETAT = Path(os.environ.get("MONITORING_ETAT", RACINE / ".cache" / "etat.bin"))
 
 
@@ -115,6 +124,7 @@ def traitement():
     )
 
     instantane = _ecrire_instantane_si_necessaire(jour, observation, enregistrement)
+    calendrier = _rafraichir_calendrier()
 
     CHEMIN_ETAT.parent.mkdir(parents=True, exist_ok=True)
     ecrire_etat(CHEMIN_ETAT, observation.empreintes_par_domaine, sel=sel(), jour=jour)
@@ -123,8 +133,47 @@ def traitement():
         "ecrit": str(destination.relative_to(RACINE)),
         "instantane": instantane,
         "statut": enregistrement["statut"],
+        "calendrier": calendrier,
         "domaines_en_mouvement": len(enregistrement["domaines"]),
     }
+
+
+def _rafraichir_calendrier():
+    """Met à jour le calendrier de production depuis l'historique des dépôts.
+
+    Sans ce rafraîchissement, la chronologie fige la dernière reconstitution
+    et finit par annoncer « aucun fichier produit » les jours mêmes où
+    l'outil mesure des publications — une page qui se contredit.
+
+    Le calendrier est secondaire : son indisponibilité ne fait pas échouer
+    le cycle, elle laisse simplement la version précédente en place.
+    """
+    try:
+        nouveau = calendrier_depuis_evenements(telecharger_evenements(contexte_public()))
+    except Exception as erreur:  # noqa: BLE001 - source secondaire
+        return {"rafraichi": False, "motif": type(erreur).__name__}
+
+    ancien = {}
+    if CHEMIN_CALENDRIER.exists():
+        ancien = json.loads(CHEMIN_CALENDRIER.read_text()).get("calendrier", {})
+    fusion = fusionner_calendriers(ancien, nouveau)
+    trous = interruptions(fusion)
+
+    CHEMIN_CALENDRIER.write_text(json.dumps({
+        "source": "https://www.data.gouv.fr/api/1/activity/ — dépôts du jeu "
+                  "annuaire-sante-extraction-des-bal-mssante",
+        "portee": "couche 0 uniquement : présence ou absence de publication, "
+                  "sans volume ni ventilation par domaine",
+        "reconstitue_le": date.today().isoformat(),
+        "premier_jour": min(fusion), "dernier_jour": max(fusion),
+        "jours_publies": len(fusion),
+        "interruptions": [
+            {"debut": d.isoformat(), "fin": f.isoformat(), "jours": (f - d).days + 1}
+            for d, f in trous
+        ],
+        "calendrier": fusion,
+    }, ensure_ascii=False, indent=1) + "\n")
+    return {"rafraichi": True, "jours": len(fusion), "interruptions": len(trous)}
 
 
 def _ecrire_instantane_si_necessaire(jour, observation, enregistrement):

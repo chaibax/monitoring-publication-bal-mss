@@ -57,6 +57,18 @@ def interruptions(calendrier):
     return trous
 
 
+def fusionner_calendriers(ancien, nouveau):
+    """Réunit deux calendriers, sans jamais perdre un jour déjà observé.
+
+    L'API d'activité pourrait répondre partiellement ; un jour disparu du
+    calendrier se lirait comme une interruption qui n'a pas eu lieu.
+    """
+    fusion = dict(ancien)
+    for jour, horodatage in nouveau.items():
+        fusion[jour] = max(fusion.get(jour, ""), horodatage)
+    return dict(sorted(fusion.items()))
+
+
 def telecharger_evenements(contexte=None, jeu=JEU_DE_DONNEES):
     """Historique complet des dépôts, en suivant la pagination."""
     evenements = []

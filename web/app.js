@@ -146,8 +146,10 @@ function bandeChrono(titre, jours, cellule) {
 function rendreChronologie(calendrier, agregats, aujourdhui) {
   const jours = derniersJours(JOURS_CHRONO, aujourdhui);
   $("chronologie").innerHTML =
+    // Un jour que l'outil a mesuré est un jour produit, même si le miroir
+    // n'avait pas encore reçu le fichier quand le calendrier a été rafraîchi.
     bandeChrono("Production du fichier par la chaîne", jours, (j) =>
-      calendrier.calendrier[j]
+      (calendrier.calendrier[j] || agregats[j])
         ? { classe: "", etat: "soleil", texte: "fichier produit" }
         : { classe: "absent", etat: "absent", texte: "aucun fichier produit" }) +
     bandeChrono("Volumes publiés, mesurés par l'outil", jours, (j) => {
