@@ -108,9 +108,40 @@
 .tableau-domaines tr.regroupement td { font-style: italic; color: var(--text-mention-grey); }
 .enveloppe-defilante { overflow-x: auto; max-height: 32rem; overflow-y: auto; }
 
-.note-lecture { color: var(--text-mention-grey); max-width: 62ch; }
+.note-lecture { color: var(--text-mention-grey); }
+
+/* En-têtes de tri : un bouton, pour la navigation au clavier. */
+.tableau-domaines thead th { padding: 0; }
+.tableau-domaines button.tri {
+  width: 100%; padding: .5rem; background: none; border: 0; cursor: pointer;
+  font: inherit; font-weight: 700; color: var(--text-title-grey);
+  text-align: left; display: flex; align-items: center; gap: .35rem;
+}
+.tableau-domaines th.nombre button.tri { justify-content: flex-end; }
+.tableau-domaines button.tri:hover { background: var(--background-contrast-grey); }
+.tableau-domaines button.tri:focus-visible { outline: 2px solid var(--border-active-blue-france); outline-offset: -2px; }
+.tri-fleche { font-size: .7em; color: var(--text-action-high-blue-france); }
+.tableau-domaines thead { position: sticky; top: 0; background: var(--background-default-grey); z-index: 1; }
 .methode p { max-width: 78ch; }
 .tuile-cle { border: 1px solid var(--border-default-grey); padding: 1rem; height: 100%; }
 .tuile-cle__valeur { font-size: 1.75rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .tuile-cle__libelle { font-size: .8rem; color: var(--text-mention-grey); margin-top: .25rem; }
 .tuile-cle__source { font-size: .7rem; color: var(--text-disabled-grey); margin-top: .5rem; }
+
+/* Bloc méthode replié. `details` natif plutôt que le composant DSFR : la page
+   ne doit rien devoir à un script à l'exécution. */
+.repli { border-top: 1px solid var(--border-default-grey);
+         border-bottom: 1px solid var(--border-default-grey); }
+.repli__titre {
+  cursor: pointer; list-style: none; padding: 1rem 2rem 1rem 0; position: relative;
+  font-size: 1.25rem; font-weight: 700; color: var(--text-title-grey);
+}
+.repli__titre::-webkit-details-marker { display: none; }
+.repli__titre::after {
+  content: "+"; position: absolute; right: .5rem; top: 50%;
+  transform: translateY(-50%); font-size: 1.5rem; font-weight: 400;
+  color: var(--text-action-high-blue-france);
+}
+.repli[open] .repli__titre::after { content: "\2212"; }
+.repli__titre:hover { background: var(--background-contrast-grey); }
+.repli__titre:focus-visible { outline: 2px solid var(--border-active-blue-france); outline-offset: 2px; }

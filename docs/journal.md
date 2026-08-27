@@ -95,6 +95,28 @@ Conséquence à connaître : tant que le secret `NETLIFY_AUTH_TOKEN` est absent,
 les agrégats sont publiés dans Git mais le site n'est pas redéployé. La tâche
 émet alors un avertissement explicite plutôt que de sauter l'étape en silence.
 
+### Décision 7 — La vue par domaine est triée par volume décroissant
+
+*Cette décision revient sur le §8 du brief, qui écrivait : « Éviter le
+classement. Ne pas trier les domaines par volume décroissant par défaut, ne
+pas produire de palmarès. » Arbitrage rendu le 27/08/2026.*
+
+Le tableau s'ouvre désormais sur le volume décroissant, et les trois colonnes
+chiffrées — boîtes publiées, publiées ce jour, retirées ce jour — sont
+triables dans les deux sens.
+
+Ce que la précaution initiale visait reste valable et reste en place : la
+page ne publie que des dénombrements, aucun statut par domaine, aucun
+pictogramme météo en face d'un exploitant, et la note de lecture rappelle
+qu'un domaine à faible volume peut rester à zéro sans anomalie. Le seuil de
+regroupement à 30 boîtes continue d'écarter plusieurs milliers de très petits
+domaines de toute lecture individuelle.
+
+Ce qui change est l'ordre de lecture, pas la nature de l'information. Un tri
+alphabétique sur mille domaines rendait la table inutilisable pour qui
+cherche son propre domaine ou veut situer un ordre de grandeur, et le tri
+reste sous le contrôle du lecteur.
+
 ---
 
 ## Surprises sur les données

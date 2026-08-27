@@ -91,11 +91,12 @@ function etatDiffusion(dernier) {
     return ["brouillard", "Le miroir data.gouv.fr n'a pas pu être interrogé lors du dernier cycle."];
   }
   const t = d.delai_secondes;
-  if (t < 0) return ["nuage", `Dépôt sur le miroir antérieur à la génération : les deux
-    sources sont incohérentes de ${duree(t)}.`];
-  if (t > 6 * 3600) return ["voile", `Le miroir accuse <b>${duree(t)}</b> de retard sur la
-    source. Le fichier est produit mais sa diffusion traîne.`];
-  return ["soleil", `Fichier repris par le miroir <b>${duree(t)}</b> après sa génération.`];
+  if (t < 0) return ["nuage", `Dépôt sur data.gouv.fr antérieur à la génération par l'ANS :
+    les deux sources sont incohérentes de ${duree(t)}.`];
+  if (t > 6 * 3600) return ["voile", `data.gouv.fr accuse <b>${duree(t)}</b> de retard sur
+    l'extraction de l'ANS. Le fichier est produit, sa rediffusion traîne.`];
+  return ["soleil", `Fichier repris par data.gouv.fr <b>${duree(t)}</b> après sa
+    génération par l'ANS.`];
 }
 
 function etatRestitution() {
@@ -198,38 +199,100 @@ function rendreHistogramme(calendrier, agregats, aujourdhui) {
 
 function rendreDomaines(instantane, dernier) {
   if (!instantane) { $("domaines").innerHTML = "<p>Aucun relevé par domaine.</p>"; return; }
-  const tous = Object.entries(instantane).sort((a, b) => a[0].localeCompare(b[0], "fr"));
-  const publies = tous.filter(([, n]) => n >= SEUIL_REGROUPEMENT);
-  const petits = tous.filter(([, n]) => n < SEUIL_REGROUPEMENT);
-  const volumePetits = petits.reduce((s, [, n]) => s + n, 0);
+
   const mouvements = (dernier && dernier.domaines) || {};
+  const mesure = dernier && dernier.statut !== "indetermine";
+  const tous = Object.entries(instantane).map(([domaine, volume]) => {
+    const m = mouvements[domaine];
+    return {
+      domaine,
+      total: m ? m[0] : volume,
+      publiees: m ? m[1] : (mesure ? 0 : null),
+      retirees: m ? m[2] : (mesure ? 0 : null),
+    };
+  });
 
-  const lignes = publies.map(([d, n]) => {
-    const m = mouvements[d];
-    // Le total du jour prime sur celui de l'instantané, qui date du dernier
-    // point de resynchronisation : sans cela la colonne des volumes et celle
-    // des mouvements décriraient deux journées différentes.
-    const total = m ? m[0] : n;
-    return `<tr><td>${d}</td><td class="nombre">${nf.format(total)}</td>
-      <td class="nombre">${m ? nf.format(m[1]) : (dernier && dernier.statut !== "indetermine" ? "0" : "—")}</td>
-      <td class="nombre">${m ? nf.format(m[2]) : (dernier && dernier.statut !== "indetermine" ? "0" : "—")}</td></tr>`;
-  }).join("");
+  const publies = tous.filter((d) => d.total >= SEUIL_REGROUPEMENT);
+  const petits = tous.filter((d) => d.total < SEUIL_REGROUPEMENT);
+  const cumul = (champ) => petits.reduce((s, d) => s + (d[champ] || 0), 0);
 
-  $("domaines").innerHTML = `
-    <p class="fr-text--sm">${nf.format(publies.length)} domaines comptant au moins
-    ${SEUIL_REGROUPEMENT} boîtes sont affichés individuellement. Les
-    ${nf.format(petits.length)} autres, qui totalisent ${nf.format(volumePetits)} boîtes,
-    sont regroupés. Tri alphabétique.</p>
-    <div class="enveloppe-defilante"><table class="tableau-domaines">
-      <caption class="fr-sr-only">Volumes et mouvements par domaine de messagerie</caption>
-      <thead><tr><th scope="col">Domaine</th><th scope="col" class="nombre">Boîtes publiées</th>
-        <th scope="col" class="nombre">Publiées ce jour</th>
-        <th scope="col" class="nombre">Retirées ce jour</th></tr></thead>
-      <tbody>${lignes}
-        <tr class="regroupement"><td>autres domaines (moins de ${SEUIL_REGROUPEMENT} boîtes)</td>
-        <td class="nombre">${nf.format(volumePetits)}</td><td class="nombre">—</td>
-        <td class="nombre">—</td></tr>
-      </tbody></table></div>`;
+  const COLONNES = [
+    { cle: "domaine",  libelle: "Domaine",          nombre: false },
+    { cle: "total",    libelle: "Boîtes publiées",  nombre: true },
+    { cle: "publiees", libelle: "Publiées ce jour", nombre: true },
+    { cle: "retirees", libelle: "Retirées ce jour", nombre: true },
+  ];
+
+  let tri = { cle: "total", sens: "desc" };
+
+  function trier(lignes) {
+    const { cle, sens } = tri;
+    const signe = sens === "asc" ? 1 : -1;
+    return [...lignes].sort((a, b) => {
+      if (cle === "domaine") return signe * a.domaine.localeCompare(b.domaine, "fr");
+      const va = a[cle] === null ? -1 : a[cle];
+      const vb = b[cle] === null ? -1 : b[cle];
+      // À valeur égale, l'ordre alphabétique tranche : le classement reste
+      // stable d'un affichage à l'autre plutôt que de dépendre du hasard.
+      return va === vb ? a.domaine.localeCompare(b.domaine, "fr") : signe * (va - vb);
+    });
+  }
+
+  function cellule(valeur) {
+    return valeur === null ? "—" : nf.format(valeur);
+  }
+
+  function dessiner() {
+    const lignes = trier(publies).map((d) => `<tr>
+      <td>${d.domaine}</td>
+      <td class="nombre">${nf.format(d.total)}</td>
+      <td class="nombre">${cellule(d.publiees)}</td>
+      <td class="nombre">${cellule(d.retirees)}</td></tr>`).join("");
+
+    const entetes = COLONNES.map((c) => {
+      const actif = tri.cle === c.cle;
+      const sensAria = actif ? (tri.sens === "asc" ? "ascending" : "descending") : "none";
+      const fleche = actif ? (tri.sens === "asc" ? "▲" : "▼") : "";
+      const prochain = actif && tri.sens === "desc" ? "croissant" : "décroissant";
+      return `<th scope="col" class="${c.nombre ? "nombre" : ""}" aria-sort="${sensAria}">
+        <button type="button" class="tri" data-cle="${c.cle}"
+          title="Trier par ${c.libelle.toLowerCase()}, ordre ${prochain}">
+          ${c.libelle}<span class="tri-fleche" aria-hidden="true">${fleche}</span></button></th>`;
+    }).join("");
+
+    $("domaines").innerHTML = `
+      <p class="fr-text--sm">${nf.format(publies.length)} domaines comptant au moins
+      ${SEUIL_REGROUPEMENT} boîtes sont affichés individuellement. Les
+      ${nf.format(petits.length)} autres, qui totalisent ${nf.format(cumul("total"))} boîtes,
+      sont regroupés sur la dernière ligne. Cliquez sur un en-tête pour changer le tri.</p>
+      <div class="enveloppe-defilante"><table class="tableau-domaines">
+        <caption class="fr-sr-only">Volumes et mouvements par domaine de messagerie,
+          triés par ${COLONNES.find((c) => c.cle === tri.cle).libelle.toLowerCase()},
+          ordre ${tri.sens === "asc" ? "croissant" : "décroissant"}</caption>
+        <thead><tr>${entetes}</tr></thead>
+        <tbody>${lignes}
+          <tr class="regroupement"><td>autres domaines (moins de ${SEUIL_REGROUPEMENT} boîtes)</td>
+          <td class="nombre">${nf.format(cumul("total"))}</td>
+          <td class="nombre">${mesure ? nf.format(cumul("publiees")) : "—"}</td>
+          <td class="nombre">${mesure ? nf.format(cumul("retirees")) : "—"}</td></tr>
+        </tbody></table></div>`;
+
+    $("domaines").querySelectorAll("button.tri").forEach((bouton) => {
+      bouton.addEventListener("click", () => {
+        const cle = bouton.dataset.cle;
+        if (tri.cle === cle) {
+          tri.sens = tri.sens === "desc" ? "asc" : "desc";
+        } else {
+          // Un volume se lit d'abord du plus grand au plus petit, un nom
+          // d'abord de A à Z.
+          tri = { cle, sens: cle === "domaine" ? "asc" : "desc" };
+        }
+        dessiner();
+      });
+    });
+  }
+
+  dessiner();
 }
 
 /* ---------- Journal ---------- */
@@ -284,9 +347,9 @@ async function demarrer() {
   } catch (e) {
     $("fraicheur").innerHTML = `<b>Les relevés n'ont pas pu être chargés.</b> L'outil est
       en difficulté, ce qui ne dit rien de l'état de la chaîne MSSanté.`;
-    $("bulletin").innerHTML = maillon("Alimentation et publication", "brouillard", "Aucune donnée.")
-      + maillon("Diffusion", "brouillard", "Aucune donnée.")
-      + maillon("Restitution", ...etatRestitution());
+    $("bulletin").innerHTML = maillon("Alimentation et publication dans l'Annuaire Santé", "brouillard", "Aucune donnée.")
+      + maillon("Diffusion sur data.gouv.fr", "brouillard", "Aucune donnée.")
+      + maillon("Restitution sur les fiches", ...etatRestitution());
     return;
   }
 
@@ -313,9 +376,9 @@ async function demarrer() {
   }
 
   $("bulletin").innerHTML =
-    maillon("Alimentation et publication", ...etatAlimentation(dernier)) +
-    maillon("Diffusion", ...etatDiffusion(dernier)) +
-    maillon("Restitution", ...etatRestitution());
+    maillon("Alimentation et publication dans l'Annuaire Santé", ...etatAlimentation(dernier)) +
+    maillon("Diffusion sur data.gouv.fr", ...etatDiffusion(dernier)) +
+    maillon("Restitution sur les fiches", ...etatRestitution());
 
   rendreChronologie(calendrier, agregats, aujourdhui);
 
