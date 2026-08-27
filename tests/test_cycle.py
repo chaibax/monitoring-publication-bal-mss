@@ -44,3 +44,32 @@ def test_un_etat_du_jour_meme_ne_sert_pas_de_reference(tmp_path, monkeypatch):
     assert cycle.etat_de_reference(date(2026, 8, 26), (date(2026, 8, 26), {"a": set()})) is None
     assert cycle.etat_de_reference(date(2026, 8, 26), (date(2026, 8, 25), {"a": set()})) == {"a": set()}
     assert cycle.etat_de_reference(date(2026, 8, 26), None) is None
+
+
+def test_un_cycle_rejoue_ne_detruit_pas_une_mesure_existante(tmp_path, monkeypatch):
+    """Rejouer un cycle sur une source inchangée ne peut rien mesurer de
+    plus. S'il écrasait l'enregistrement, il détruirait la mesure du jour —
+    irrécupérable, puisque le fichier de la veille n'existe plus nulle part."""
+    monkeypatch.setattr(cycle, "DOSSIER_AGREGATS", tmp_path)
+    (tmp_path / "2026-08-27.json").write_text(json.dumps({
+        "date": "2026-08-27", "source_fingerprint": "abc", "statut": "nominal",
+        "national": {"creations": 1453, "suppressions": 247, "total_bal": 536966},
+    }))
+
+    mesure = {"date": "2026-08-27", "source_fingerprint": "abc", "statut": "indetermine",
+              "national": {"creations": None, "suppressions": None, "total_bal": 536966}}
+
+    assert cycle.doit_conserver_l_existant(date(2026, 8, 27), mesure) is True
+
+
+def test_une_source_nouvelle_remplace_toujours_l_enregistrement(tmp_path, monkeypatch):
+    monkeypatch.setattr(cycle, "DOSSIER_AGREGATS", tmp_path)
+    (tmp_path / "2026-08-27.json").write_text(json.dumps({
+        "date": "2026-08-27", "source_fingerprint": "abc", "statut": "nominal",
+        "national": {"creations": 1453, "suppressions": 247, "total_bal": 536966},
+    }))
+
+    nouvelle = {"date": "2026-08-27", "source_fingerprint": "DIFFERENTE",
+                "statut": "indetermine", "national": {"creations": None}}
+
+    assert cycle.doit_conserver_l_existant(date(2026, 8, 27), nouvelle) is False

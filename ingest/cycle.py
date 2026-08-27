@@ -98,6 +98,24 @@ def etat_de_reference(jour, etat_charge):
     return None if jour_de_l_etat >= jour else empreintes
 
 
+def doit_conserver_l_existant(jour, enregistrement):
+    """Vrai si l'enregistrement déjà écrit vaut mieux que celui qu'on produit.
+
+    Un cycle rejoué sur une source inchangée ne peut rien mesurer de plus :
+    l'état de référence porte déjà cette journée. S'il écrasait le fichier,
+    il détruirait la mesure du jour, irrécupérable — l'extraction de la
+    veille n'existe plus ni chez l'ANS ni sur le miroir.
+    """
+    existant = DOSSIER_AGREGATS / f"{jour.isoformat()}.json"
+    if not existant.exists() or enregistrement["statut"] != "indetermine":
+        return False
+    precedent = json.loads(existant.read_text())
+    return (
+        precedent.get("source_fingerprint") == enregistrement["source_fingerprint"]
+        and precedent.get("statut") != "indetermine"
+    )
+
+
 def traitement():
     """Cycle complet : télécharger, lire, comparer, écrire."""
     ans = sonder_ans()
@@ -119,9 +137,11 @@ def traitement():
 
     DOSSIER_AGREGATS.mkdir(parents=True, exist_ok=True)
     destination = DOSSIER_AGREGATS / f"{jour.isoformat()}.json"
-    destination.write_text(
-        json.dumps(enregistrement, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
-    )
+    conserve = doit_conserver_l_existant(jour, enregistrement)
+    if not conserve:
+        destination.write_text(
+            json.dumps(enregistrement, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
+        )
 
     instantane = _ecrire_instantane_si_necessaire(jour, observation, enregistrement)
     calendrier = _rafraichir_calendrier()
@@ -132,7 +152,7 @@ def traitement():
     return {
         "ecrit": str(destination.relative_to(RACINE)),
         "instantane": instantane,
-        "statut": enregistrement["statut"],
+        "statut": "conserve" if conserve else enregistrement["statut"],
         "calendrier": calendrier,
         "domaines_en_mouvement": len(enregistrement["domaines"]),
     }
