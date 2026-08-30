@@ -1,0 +1,213 @@
+{
+ "date": "2026-08-30",
+ "diffusion": {
+  "delai_secondes": 167,
+  "depose_le": "2026-08-30T08:21:47.431000+00:00",
+  "empreinte_miroir": "a4b9bf781316ba95bf6bd670cdd37cc2f197c071",
+  "genere_le": "2026-08-30T10:19:00",
+  "mesure": true
+ },
+ "domaines": {
+  "admr65.mssante.fr": [
+   2,
+   2,
+   0
+  ],
+  "adsea09.mssante.fr": [
+   4,
+   4,
+   0
+  ],
+  "ahsm.mssante.fr": [
+   807,
+   0,
+   1
+  ],
+  "apf.bfc.mssante.fr": [
+   69,
+   3,
+   0
+  ],
+  "aura.mssante.fr": [
+   62429,
+   0,
+   2
+  ],
+  "ch-dax.mssante.fr": [
+   1193,
+   1,
+   0
+  ],
+  "ch-perpignan.mssante.fr": [
+   496,
+   0,
+   1
+  ],
+  "ch-troyes.mssante.fr": [
+   569,
+   3,
+   1
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   4777,
+   25,
+   36
+  ],
+  "chru-nancy.mssante.fr": [
+   1846,
+   1,
+   0
+  ],
+  "chu-bordeaux.mssante.fr": [
+   2749,
+   1,
+   0
+  ],
+  "chu-nice.mssante.fr": [
+   1220,
+   1,
+   0
+  ],
+  "chu-rouen.mssante.fr": [
+   1524,
+   3,
+   0
+  ],
+  "chu-toulouse.mssante.fr": [
+   4407,
+   2,
+   0
+  ],
+  "clinique-renaison.aura.mssante.fr": [
+   19,
+   0,
+   1
+  ],
+  "cvl.mssante.fr": [
+   1496,
+   0,
+   1
+  ],
+  "ehpadccaslille.mssante.fr": [
+   8,
+   8,
+   0
+  ],
+  "emeis.mssante.fr": [
+   2947,
+   2,
+   1
+  ],
+  "esantepdl.mssante.fr": [
+   2124,
+   2,
+   18
+  ],
+  "guadeloupe.mssante.fr": [
+   895,
+   0,
+   1
+  ],
+  "hcs-sante.mssante.fr": [
+   569,
+   3,
+   1
+  ],
+  "i-vancauwenberghe.mssante.fr": [
+   3,
+   3,
+   0
+  ],
+  "icm46.mssante.fr": [
+   83,
+   0,
+   1
+  ],
+  "infirmier.mssante.fr": [
+   15995,
+   69,
+   80
+  ],
+  "inicea.mssante.fr": [
+   1249,
+   1,
+   0
+  ],
+  "interop-mssante.apicrypt.org": [
+   24159,
+   0,
+   1
+  ],
+  "lgpi.mssante.fr": [
+   3929,
+   1,
+   2
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8020,
+   36,
+   57
+  ],
+  "medecin.mp.mssante.fr": [
+   388,
+   0,
+   1
+  ],
+  "medecin.mssante.fr": [
+   62245,
+   60,
+   122
+  ],
+  "orthophoniste.mssante.fr": [
+   8612,
+   36,
+   65
+  ],
+  "pdl.mssante.fr": [
+   21,
+   0,
+   2
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1201,
+   2,
+   6
+  ],
+  "pharmacie-paca.mssante.fr": [
+   1882,
+   1,
+   0
+  ],
+  "pharmacien.mssante.fr": [
+   7221,
+   19,
+   25
+  ],
+  "pro.mssante.fr": [
+   24399,
+   86,
+   124
+  ],
+  "sage-femme.mssante.fr": [
+   5669,
+   2,
+   8
+  ]
+ },
+ "fetched_at": "2026-08-30T09:09:17+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 537644,
+ "modifications": null,
+ "national": {
+  "creations": 377,
+  "suppressions": 558,
+  "total_bal": 537472
+ },
+ "par_type": {
+  "ORG": 80606,
+  "PER": 456866
+ },
+ "source_fingerprint": "bf0073d21b7fa5a66f8c5da560f7d59670fdda7aa81f28fe7cf8e451173df26b",
+ "source_timestamp": "2026-08-30T10:19:00",
+ "statut": "nominal"
+}
