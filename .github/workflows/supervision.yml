@@ -1,21 +1,15 @@
-# Supervision de la chaîne de publication des BAL MSSanté.
+# TEMPORAIRE — exécution de diagnostic du refus « Forbidden » au déploiement.
 #
-# Deux jobs, pas un seul job lourd répété : la sonde ne transfère aucun
-# contenu et tourne cinq fois par jour ; le traitement ne se déclenche que
-# si l'horodatage de génération a bougé, soit une fois par jour en rythme
-# nominal. C'est autant de charge en moins sur les serveurs de l'ANS.
+# Cette version de la tâche ne vit que sur la branche de travail : elle ne
+# collecte rien, ne commite rien, et ne publie rien en production. Elle
+# interroge l'API Netlify avec le jeton du dépôt pour localiser précisément
+# l'appel qui est refusé, puis tente un déploiement en brouillon.
 #
-# L'heure d'exécution n'est jamais l'horodatage de référence : c'est celui
-# du fichier source qui fait foi.
+# Le contenu original est restauré dès le diagnostic obtenu.
 
 name: Supervision
 
 on:
-  schedule:
-    # 03:10, 07:10, 11:10, 15:10 et 19:10 UTC. Jamais à l'heure ronde : les
-    # tâches planifiées sont retardées en période de charge, surtout à :00.
-    # La génération par l'ANS se situe le plus souvent entre 02:00 et 04:00 UTC.
-    - cron: '10 3,7,11,15,19 * * *'
   workflow_dispatch:
     inputs:
       forcer:
@@ -24,100 +18,71 @@ on:
         default: false
 
 permissions:
-  contents: write
-
-concurrency:
-  group: supervision
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  sonde:
-    name: Sonde de disponibilité
+  diagnostic:
+    name: Diagnostic du déploiement
     runs-on: ubuntu-latest
-    timeout-minutes: 3   # sans plafond explicite, GitHub laisse tourner six heures
-    outputs:
-      traitement_requis: ${{ steps.sonder.outputs.traitement_requis }}
-      horodatage: ${{ steps.sonder.outputs.horodatage }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Interroger les en-têtes de la source
-        id: sonder
-        run: |
-          python -m ingest.cycle sonde > sonde.json
-          cat sonde.json
-          python - <<'PY' >> "$GITHUB_OUTPUT"
-          import json
-          s = json.load(open("sonde.json"))
-          print(f"traitement_requis={str(s['traitement_requis']).lower()}")
-          print(f"horodatage={s['horodatage_generation']}")
-          PY
-
-  traitement:
-    name: Traitement complet
-    needs: sonde
-    if: needs.sonde.outputs.traitement_requis == 'true' || inputs.forcer
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    # Au niveau du job : un `env` de job est lisible dans le `if` d'un step,
-    # ce que ni `secrets` ni un `env` défini sur le step lui-même ne sont.
+    timeout-minutes: 10
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
 
-      # L'état de référence ne va jamais dans Git : il contient les empreintes
-      # salées de la veille. Le cache l'évince au bout de sept jours sans
-      # consultation ; le cycle repart alors de zéro et marque la journée
-      # indéterminée, jamais en anomalie.
-      - name: Restaurer l'état de référence
-        uses: actions/cache@v4
-        with:
-          path: .cache
-          key: etat-${{ github.run_id }}
-          restore-keys: etat-
-
-      - name: Cycle complet
-        env:
-          MONITORING_SEL: ${{ secrets.MONITORING_SEL }}
-        run: python -m ingest.cycle traitement
-
-      # Une revue humaine ne suffit pas sur un dépôt public alimenté par un
-      # robot : ce qui est commité l'est définitivement.
-      - name: Contrôle avant commit
-        run: python -m ingest.garde_fou data/daily/*.json data/snapshots/*.json
-
-      - name: Publier les agrégats
+      # Chaque appel est un GET : rien n'est créé, rien n'est publié. Seuls le
+      # libellé et le code HTTP sortent dans le journal, jamais un identifiant
+      # de compte — les journaux d'un dépôt public sont lisibles par tous.
+      - name: Localiser l'appel refusé
         run: |
-          git config user.name  "robot-supervision"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/
-          if git diff --cached --quiet; then
-            echo "Aucun agrégat nouveau — rien à publier."
-            exit 0
+          set -uo pipefail
+          API=https://api.netlify.com/api/v1
+          AUTH="Authorization: Bearer $NETLIFY_AUTH_TOKEN"
+
+          sonder() {
+            local libelle="$1" url="$2" code
+            code=$(curl -sS -H "$AUTH" -o /tmp/corps.json -w '%{http_code}' "$url") || code=000
+            printf '%-42s %s' "$libelle" "$code"
+            if [ "$code" != "200" ]; then
+              printf '  <- %s' "$(head -c 300 /tmp/corps.json | tr -d '\n' | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g')"
+            fi
+            printf '\n'
+          }
+
+          COMPTE=$(curl -sS -H "$AUTH" "$API/accounts" \
+            | python3 -c 'import json,sys; c=json.load(sys.stdin); print(c[0]["id"] if c else "")')
+
+          echo "== Lectures =="
+          sonder "utilisateur"                  "$API/user"
+          sonder "liste des projets"            "$API/sites?per_page=1"
+          sonder "projet cible"                 "$API/sites/$NETLIFY_SITE_ID"
+          sonder "deploiements du projet"       "$API/sites/$NETLIFY_SITE_ID/deploys?per_page=1"
+          sonder "comptes"                      "$API/accounts"
+          if [ -n "$COMPTE" ]; then
+            sonder "variables d'env. du compte" "$API/accounts/$COMPTE/env?site_id=$NETLIFY_SITE_ID"
+            sonder "membres du compte"          "$API/$COMPTE/members"
+          else
+            echo "aucun compte lisible par ce jeton"
           fi
-          git commit -m "Agrégats du ${{ needs.sonde.outputs.horodatage }}"
-          git push
 
-      - name: Déployer le site
-        if: env.NETLIFY_AUTH_TOKEN != ''
-        # Le projet est désigné explicitement : le dépôt n'est pas lié côté
-        # Netlify. La construction est le comportement par défaut en v26,
-        # il n'y a plus de drapeau --build.
+      - name: Version du CLI
+        run: npx --yes netlify-cli@26 --version
+
+      # Sans --prod : le déploiement part en brouillon sur une URL éphémère,
+      # le site en production n'est pas touché.
+      - name: Déploiement en brouillon, sans construction
+        continue-on-error: true
         run: |
-          # Diagnostic volontairement muet sur les noms de projet : les
-          # journaux d'exécution d'un dépôt public sont lisibles par tous.
-          npx --yes netlify-cli@26 api listSites --data '{}' \
-            | python3 -c "import json,sys,os; s=json.load(sys.stdin); cible=os.environ['NETLIFY_SITE_ID']; visible=any(p['id']==cible for p in s); print(f'Jeton : {len(s)} projet(s) accessible(s), projet cible {\"visible\" if visible else \"INVISIBLE — le jeton appartient probablement à un autre compte Netlify\"}.')"
-          npx --yes netlify-cli@26 deploy --prod --site "$NETLIFY_SITE_ID"
+          set -uo pipefail
+          npx --yes netlify-cli@26 deploy \
+            --site "$NETLIFY_SITE_ID" --dir web --no-build --debug 2>&1 \
+            | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g'
 
-      - name: Signaler l'absence de jeton de déploiement
-        if: env.NETLIFY_AUTH_TOKEN == ''
-        run: echo "::warning::NETLIFY_AUTH_TOKEN absent — les agrégats sont publiés, le site n'est pas redéployé." 
+      - name: Déploiement en brouillon, avec construction
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          npx --yes netlify-cli@26 deploy \
+            --site "$NETLIFY_SITE_ID" --debug 2>&1 \
+            | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g'
