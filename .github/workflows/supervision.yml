@@ -1,20 +1,21 @@
-# TEMPORAIRE — exécution de diagnostic du refus « Forbidden » au déploiement.
+# Supervision de la chaîne de publication des BAL MSSanté.
 #
-# Le premier passage a établi que le jeton lit tout (sept points d'API en 200)
-# et qu'il crée des déploiements en brouillon sans difficulté, construction
-# comprise. Seul « --prod » est refusé : le refus porte donc sur la mise en
-# production, pas sur la création du déploiement.
+# Deux jobs, pas un seul job lourd répété : la sonde ne transfère aucun
+# contenu et tourne cinq fois par jour ; le traitement ne se déclenche que
+# si l'horodatage de génération a bougé, soit une fois par jour en rythme
+# nominal. C'est autant de charge en moins sur les serveurs de l'ANS.
 #
-# Ce second passage isole cette opération. Il publie un déploiement déjà
-# construit lors du passage précédent, en appelant l'API directement pour voir
-# le code HTTP et le corps de la réponse — ce que le CLI masque derrière son
-# « JSONHTTPError: Forbidden ».
-#
-# Le contenu original est restauré dès le diagnostic obtenu.
+# L'heure d'exécution n'est jamais l'horodatage de référence : c'est celui
+# du fichier source qui fait foi.
 
 name: Supervision
 
 on:
+  schedule:
+    # 03:10, 07:10, 11:10, 15:10 et 19:10 UTC. Jamais à l'heure ronde : les
+    # tâches planifiées sont retardées en période de charge, surtout à :00.
+    # La génération par l'ANS se situe le plus souvent entre 02:00 et 04:00 UTC.
+    - cron: '10 3,7,11,15,19 * * *'
   workflow_dispatch:
     inputs:
       forcer:
@@ -23,54 +24,97 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: supervision
+  cancel-in-progress: false
 
 jobs:
-  diagnostic:
-    name: Diagnostic du déploiement
+  sonde:
+    name: Sonde de disponibilité
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 3   # sans plafond explicite, GitHub laisse tourner six heures
+    outputs:
+      traitement_requis: ${{ steps.sonder.outputs.traitement_requis }}
+      horodatage: ${{ steps.sonder.outputs.horodatage }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Interroger les en-têtes de la source
+        id: sonder
+        run: |
+          python -m ingest.cycle sonde > sonde.json
+          cat sonde.json
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          s = json.load(open("sonde.json"))
+          print(f"traitement_requis={str(s['traitement_requis']).lower()}")
+          print(f"horodatage={s['horodatage_generation']}")
+          PY
+
+  traitement:
+    name: Traitement complet
+    needs: sonde
+    if: needs.sonde.outputs.traitement_requis == 'true' || inputs.forcer
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Au niveau du job : un `env` de job est lisible dans le `if` d'un step,
+    # ce que ni `secrets` ni un `env` défini sur le step lui-même ne sont.
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
-      # Déploiement construit et téléversé lors du passage précédent, à partir
-      # des agrégats à jour. Le publier suffit à remettre le site à niveau.
-      BROUILLON: 6a9ebd699b707bf426fd4329
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      - name: Publier un déploiement existant, réponse HTTP en clair
-        run: |
-          set -uo pipefail
-          code=$(curl -sS -X POST \
-            -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
-            -H 'Content-Length: 0' \
-            -o /tmp/corps.json -w '%{http_code}' \
-            "https://api.netlify.com/api/v1/sites/$NETLIFY_SITE_ID/deploys/$BROUILLON/restore") || code=000
-          echo "== Mise en production d'un déploiement existant =="
-          echo "code HTTP : $code"
-          echo "réponse   : $(head -c 600 /tmp/corps.json | tr -d '\n' | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g')"
+      # L'état de référence ne va jamais dans Git : il contient les empreintes
+      # salées de la veille. Le cache l'évince au bout de sept jours sans
+      # consultation ; le cycle repart alors de zéro et marque la journée
+      # indéterminée, jamais en anomalie.
+      - name: Restaurer l'état de référence
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: etat-${{ github.run_id }}
+          restore-keys: etat-
 
-      - name: Cycle complet de déploiement en production
-        continue-on-error: true
-        run: |
-          set -uo pipefail
-          npx --yes netlify-cli@26 deploy \
-            --site "$NETLIFY_SITE_ID" --prod --debug 2>&1 \
-            | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g'
+      - name: Cycle complet
+        env:
+          MONITORING_SEL: ${{ secrets.MONITORING_SEL }}
+        run: python -m ingest.cycle traitement
 
-      - name: État publié après tentative
-        if: always()
+      # Une revue humaine ne suffit pas sur un dépôt public alimenté par un
+      # robot : ce qui est commité l'est définitivement.
+      - name: Contrôle avant commit
+        run: python -m ingest.garde_fou data/daily/*.json data/snapshots/*.json
+
+      - name: Publier les agrégats
         run: |
-          set -uo pipefail
-          curl -sS -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
-            "https://api.netlify.com/api/v1/sites/$NETLIFY_SITE_ID" \
-            | python3 -c '
-          import json, sys
-          s = json.load(sys.stdin)
-          p = s.get("published_deploy") or {}
-          print("déploiement publié :", p.get("id"))
-          print("publié le          :", p.get("published_at"))
-          print("verrouillé         :", p.get("locked"))
-          print("constructions      :", "arrêtées" if (s.get("build_settings") or {}).get("stop_builds") else "actives")
-          '
+          git config user.name  "robot-supervision"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "Aucun agrégat nouveau — rien à publier."
+            exit 0
+          fi
+          git commit -m "Agrégats du ${{ needs.sonde.outputs.horodatage }}"
+          git push
+
+      # Commiter n'est pas publier : entre le 2026-09-04 et le 2026-09-07, les
+      # agrégats sont arrivés chaque jour dans Git pendant que le site restait
+      # figé au 3 septembre, faute d'un déploiement qui aboutisse. L'étape
+      # ci-dessous est celle qui a lâché ; la vigie surveille désormais aussi
+      # ce qu'elle produit, et pas seulement ce que Git contient.
+      - name: Déployer le site
+        if: env.NETLIFY_AUTH_TOKEN != ''
+        run: bash web/publier.sh
+
+      - name: Signaler l'absence de jeton de déploiement
+        if: env.NETLIFY_AUTH_TOKEN == ''
+        run: echo "::warning::NETLIFY_AUTH_TOKEN absent — les agrégats sont publiés, le site n'est pas redéployé."
