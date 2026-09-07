@@ -117,6 +117,71 @@ alphabétique sur mille domaines rendait la table inutilisable pour qui
 cherche son propre domaine ou veut situer un ordre de grandeur, et le tri
 reste sous le contrôle du lecteur.
 
+### Décision 8 — La mise en production ne passe plus par `netlify deploy --prod`
+
+*Arbitrage rendu le 07/09/2026, après quatre jours de site figé.*
+
+Du 2026-09-04 au 2026-09-07, le site a servi les données du 3 septembre
+pendant que les agrégats des 4, 5 et 6 arrivaient normalement dans Git. Les
+trois exécutions concernées ont échoué à la dernière étape, sur un
+`JSONHTTPError: Forbidden` émis par le CLI sans corps de réponse.
+
+Le refus a été circonscrit par élimination. Le jeton lit tout — utilisateur,
+projets, projet cible, déploiements, comptes, variables d'environnement du
+compte, membres : sept points d'API, sept fois 200. Il construit, il
+téléverse, il crée des déploiements en brouillon. Il publie même un
+déploiement existant, `POST /sites/{id}/deploys/{id}/restore` répondant 200.
+Le projet n'est ni verrouillé ni protégé par mot de passe, ses constructions
+sont actives, et le CLI n'a pas dérivé — la 26.2.0 date du 7 juillet. Seul le
+chemin `--prod` du CLI échoue, avant même que la construction ne démarre.
+
+La publication est donc décomposée en deux opérations dont on a la preuve
+qu'elles passent : `netlify deploy` construit et téléverse, puis l'API bascule
+le déploiement obtenu en production. La version du CLI est figée au passage —
+sur une étape qui ne s'exécute qu'une fois par jour et sans personne pour la
+regarder, une dérive amont ne doit pas pouvoir s'inviter. Et le corps de la
+réponse HTTP est désormais recraché dans le journal en cas de refus : c'est
+son absence qui a coûté l'essentiel de l'enquête.
+
+La cause première du refus reste inconnue et vit côté Netlify, hors du dépôt.
+Le contournement ne la masque pas : il emprunte un chemin dont chaque étape
+est vérifiée, et rend le prochain refus lisible du premier coup d'œil.
+
+Effet de bord à connaître : créé sans `--prod`, le déploiement porte le
+contexte `deploy-preview` alors qu'il est bien celui que sert le domaine de
+production. Sans conséquence tant que `netlify.toml` ne définit aucun bloc
+`[context.production]` — il n'en a aucun, et les en-têtes de sécurité, eux,
+sont bien appliqués. Le jour où un tel bloc apparaîtra, il faudra le savoir :
+il ne s'appliquerait pas.
+
+Chaîne vérifiée de bout en bout le 07/09/2026 : sonde, cycle complet,
+garde-fou, commit des agrégats du jour, construction, téléversement, mise en
+production. Déploiement `6a9ec017` publié à 13:46:13 UTC.
+
+### Décision 9 — La vigie mesure ce que sert le site, pas ce que contient Git
+
+*Corollaire de la décision 8, même date.*
+
+Pendant les quatre jours de panne, la vigie est restée verte chaque matin.
+Elle mesurait l'âge du dernier fichier de `data/daily`, qui était
+irréprochable. La panne s'était logée exactement dans son angle mort : entre
+le commit et le déploiement.
+
+Pour un outil dont la raison d'être est de dater les ruptures de publication
+d'autrui, ne pas voir la sienne est le défaut à corriger en premier. La vigie
+porte donc deux règles, parce qu'il y a deux façons de s'arrêter : produire, et
+publier. La seconde se lit du dehors, comme un visiteur — elle interroge
+`data/index.json` sur le site en ligne et compare le dernier jour servi à la
+date du jour. Elle s'exécute même si la première a échoué, une collecte en
+panne ne devant pas masquer une publication en panne.
+
+Défaut corrigé au passage : `SLACK_WEBHOOK` était déclaré sur l'étape d'alerte
+elle-même, et testé dans le `if` de cette même étape. C'est précisément le
+piège que la tâche Supervision documentait déjà en toutes lettres — un `env`
+défini sur un step n'est pas lisible dans le `if` de ce step. La condition
+était donc toujours fausse : l'alerte Slack n'aurait pas été émise même si la
+vigie avait vu la panne. Le webhook est remonté au niveau du job.
+
 ---
 
 ## Surprises sur les données

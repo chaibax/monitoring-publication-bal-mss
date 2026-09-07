@@ -5,6 +5,13 @@
 # alors le propriétaire du dépôt — dès que plus aucun agrégat n'a été produit
 # depuis 48 heures. Elle couvre aussi bien une source injoignable qu'une
 # désactivation des tâches planifiées après soixante jours d'inactivité.
+#
+# Deux règles, parce qu'il y a deux façons de s'arrêter. Produire n'est pas
+# publier : du 2026-09-04 au 2026-09-07, les agrégats sont arrivés chaque jour
+# dans Git — la première règle est restée verte quatre jours durant — pendant
+# que le site servait toujours ceux du 3 septembre, le déploiement échouant en
+# bout de chaîne. Ce que lit un visiteur est la seule mesure qui compte
+# vraiment ; elle a donc sa propre règle.
 
 name: Vigie de l'outil
 
@@ -18,6 +25,12 @@ jobs:
     name: Âge des agrégats
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    # Au niveau du job : un `env` de job est lisible dans le `if` d'un step,
+    # ce que ni `secrets` ni un `env` défini sur le step lui-même ne sont.
+    # Déclaré ici, le webhook conditionne réellement l'étape d'alerte.
+    env:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      SITE_PUBLIE: https://monitoring-publication-bal-mss.netlify.app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -43,10 +56,36 @@ jobs:
               )
           PY
 
+      # Cette règle se lit du dehors, comme un visiteur : elle interroge le site
+      # publié, pas le dépôt. Elle échoue là où la précédente reste verte —
+      # quand la collecte tourne mais que la publication ne suit plus.
+      - name: Vérifier que le site publie encore
+        if: always()   # une collecte en panne ne doit pas masquer une publication en panne
+        run: |
+          python - <<'PY'
+          import json, os, sys, urllib.error, urllib.request
+          from datetime import date
+          url = os.environ["SITE_PUBLIE"].rstrip("/") + "/data/index.json"
+          try:
+              with urllib.request.urlopen(url, timeout=30) as reponse:
+                  jours = json.load(reponse)["jours"]
+          except (urllib.error.URLError, ValueError, KeyError) as motif:
+              sys.exit(f"ALERTE — le site publié est injoignable ou illisible ({url}) : {motif}")
+          if not jours:
+              sys.exit("ALERTE — le site ne sert aucun agrégat.")
+          age = (date.today() - date.fromisoformat(jours[-1])).days
+          print(f"Dernier agrégat servi par le site : {jours[-1]} ({age} j)")
+          if age > 2:
+              sys.exit(
+                  f"ALERTE — le site sert des données vieilles de {age} jours "
+                  f"(dernier : {jours[-1]}). Les agrégats peuvent être à jour dans Git "
+                  "sans que la publication ait suivi : vérifier l'étape de déploiement "
+                  "de la tâche Supervision."
+              )
+          PY
+
       - name: Prévenir sur Slack
         if: failure() && env.SLACK_WEBHOOK != ''
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
           curl -sS -X POST -H 'Content-type: application/json' --data "$(python - <<'PY'
           import json, os
@@ -54,7 +93,8 @@ jobs:
           execution = os.environ.get("GITHUB_RUN_ID", "")
           print(json.dumps({"text":
               ":warning: *Supervision BAL MSSanté* — l'outil ne produit plus d'agrégat "
-              "depuis plus de 48 heures. Règle déclenchée : fraîcheur des agrégats. "
+              "depuis plus de 48 heures, ou le site n'en publie plus. Règle déclenchée : "
+              "fraîcheur des agrégats. "
               f"Détail : https://github.com/{depot}/actions/runs/{execution}"}))
           PY
           )" "$SLACK_WEBHOOK"
