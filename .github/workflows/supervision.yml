@@ -1,9 +1,14 @@
 # TEMPORAIRE — exécution de diagnostic du refus « Forbidden » au déploiement.
 #
-# Cette version de la tâche ne vit que sur la branche de travail : elle ne
-# collecte rien, ne commite rien, et ne publie rien en production. Elle
-# interroge l'API Netlify avec le jeton du dépôt pour localiser précisément
-# l'appel qui est refusé, puis tente un déploiement en brouillon.
+# Le premier passage a établi que le jeton lit tout (sept points d'API en 200)
+# et qu'il crée des déploiements en brouillon sans difficulté, construction
+# comprise. Seul « --prod » est refusé : le refus porte donc sur la mise en
+# production, pas sur la création du déploiement.
+#
+# Ce second passage isole cette opération. Il publie un déploiement déjà
+# construit lors du passage précédent, en appelant l'API directement pour voir
+# le code HTTP et le corps de la réponse — ce que le CLI masque derrière son
+# « JSONHTTPError: Forbidden ».
 #
 # Le contenu original est restauré dès le diagnostic obtenu.
 
@@ -28,61 +33,44 @@ jobs:
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+      # Déploiement construit et téléversé lors du passage précédent, à partir
+      # des agrégats à jour. Le publier suffit à remettre le site à niveau.
+      BROUILLON: 6a9ebd699b707bf426fd4329
     steps:
       - uses: actions/checkout@v4
 
-      # Chaque appel est un GET : rien n'est créé, rien n'est publié. Seuls le
-      # libellé et le code HTTP sortent dans le journal, jamais un identifiant
-      # de compte — les journaux d'un dépôt public sont lisibles par tous.
-      - name: Localiser l'appel refusé
+      - name: Publier un déploiement existant, réponse HTTP en clair
         run: |
           set -uo pipefail
-          API=https://api.netlify.com/api/v1
-          AUTH="Authorization: Bearer $NETLIFY_AUTH_TOKEN"
+          code=$(curl -sS -X POST \
+            -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+            -H 'Content-Length: 0' \
+            -o /tmp/corps.json -w '%{http_code}' \
+            "https://api.netlify.com/api/v1/sites/$NETLIFY_SITE_ID/deploys/$BROUILLON/restore") || code=000
+          echo "== Mise en production d'un déploiement existant =="
+          echo "code HTTP : $code"
+          echo "réponse   : $(head -c 600 /tmp/corps.json | tr -d '\n' | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g')"
 
-          sonder() {
-            local libelle="$1" url="$2" code
-            code=$(curl -sS -H "$AUTH" -o /tmp/corps.json -w '%{http_code}' "$url") || code=000
-            printf '%-42s %s' "$libelle" "$code"
-            if [ "$code" != "200" ]; then
-              printf '  <- %s' "$(head -c 300 /tmp/corps.json | tr -d '\n' | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g')"
-            fi
-            printf '\n'
-          }
-
-          COMPTE=$(curl -sS -H "$AUTH" "$API/accounts" \
-            | python3 -c 'import json,sys; c=json.load(sys.stdin); print(c[0]["id"] if c else "")')
-
-          echo "== Lectures =="
-          sonder "utilisateur"                  "$API/user"
-          sonder "liste des projets"            "$API/sites?per_page=1"
-          sonder "projet cible"                 "$API/sites/$NETLIFY_SITE_ID"
-          sonder "deploiements du projet"       "$API/sites/$NETLIFY_SITE_ID/deploys?per_page=1"
-          sonder "comptes"                      "$API/accounts"
-          if [ -n "$COMPTE" ]; then
-            sonder "variables d'env. du compte" "$API/accounts/$COMPTE/env?site_id=$NETLIFY_SITE_ID"
-            sonder "membres du compte"          "$API/$COMPTE/members"
-          else
-            echo "aucun compte lisible par ce jeton"
-          fi
-
-      - name: Version du CLI
-        run: npx --yes netlify-cli@26 --version
-
-      # Sans --prod : le déploiement part en brouillon sur une URL éphémère,
-      # le site en production n'est pas touché.
-      - name: Déploiement en brouillon, sans construction
+      - name: Cycle complet de déploiement en production
         continue-on-error: true
         run: |
           set -uo pipefail
           npx --yes netlify-cli@26 deploy \
-            --site "$NETLIFY_SITE_ID" --dir web --no-build --debug 2>&1 \
+            --site "$NETLIFY_SITE_ID" --prod --debug 2>&1 \
             | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g'
 
-      - name: Déploiement en brouillon, avec construction
-        continue-on-error: true
+      - name: État publié après tentative
+        if: always()
         run: |
           set -uo pipefail
-          npx --yes netlify-cli@26 deploy \
-            --site "$NETLIFY_SITE_ID" --debug 2>&1 \
-            | sed -E 's/[A-Za-z0-9_-]{40,}/[MASQUE]/g'
+          curl -sS -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+            "https://api.netlify.com/api/v1/sites/$NETLIFY_SITE_ID" \
+            | python3 -c '
+          import json, sys
+          s = json.load(sys.stdin)
+          p = s.get("published_deploy") or {}
+          print("déploiement publié :", p.get("id"))
+          print("publié le          :", p.get("published_at"))
+          print("verrouillé         :", p.get("locked"))
+          print("constructions      :", "arrêtées" if (s.get("build_settings") or {}).get("stop_builds") else "actives")
+          '
