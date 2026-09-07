@@ -11,6 +11,12 @@
 # La publication est donc décomposée en deux opérations dont on a la preuve
 # qu'elles passent : le CLI construit et téléverse, l'API bascule ensuite le
 # déploiement en production. Voir la décision 8 du journal.
+#
+# Effet de bord à connaître : créé sans « --prod », le déploiement porte le
+# contexte « deploy-preview » alors même qu'il est celui que sert le domaine
+# de production. C'est sans conséquence tant que `netlify.toml` ne définit
+# aucun bloc `[context.production]` — il n'en a aucun. Le jour où il en aura
+# un, il faudra le savoir : il ne s'appliquerait pas.
 set -euo pipefail
 
 : "${NETLIFY_AUTH_TOKEN:?jeton de déploiement absent}"

@@ -147,6 +147,17 @@ La cause première du refus reste inconnue et vit côté Netlify, hors du dépô
 Le contournement ne la masque pas : il emprunte un chemin dont chaque étape
 est vérifiée, et rend le prochain refus lisible du premier coup d'œil.
 
+Effet de bord à connaître : créé sans `--prod`, le déploiement porte le
+contexte `deploy-preview` alors qu'il est bien celui que sert le domaine de
+production. Sans conséquence tant que `netlify.toml` ne définit aucun bloc
+`[context.production]` — il n'en a aucun, et les en-têtes de sécurité, eux,
+sont bien appliqués. Le jour où un tel bloc apparaîtra, il faudra le savoir :
+il ne s'appliquerait pas.
+
+Chaîne vérifiée de bout en bout le 07/09/2026 : sonde, cycle complet,
+garde-fou, commit des agrégats du jour, construction, téléversement, mise en
+production. Déploiement `6a9ec017` publié à 13:46:13 UTC.
+
 ### Décision 9 — La vigie mesure ce que sert le site, pas ce que contient Git
 
 *Corollaire de la décision 8, même date.*
