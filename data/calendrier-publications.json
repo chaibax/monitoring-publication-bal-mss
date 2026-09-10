@@ -1,10 +1,10 @@
 {
  "source": "https://www.data.gouv.fr/api/1/activity/ — dépôts du jeu annuaire-sante-extraction-des-bal-mssante",
  "portee": "couche 0 uniquement : présence ou absence de publication, sans volume ni ventilation par domaine",
- "reconstitue_le": "2026-09-09",
+ "reconstitue_le": "2026-09-10",
  "premier_jour": "2025-10-29",
- "dernier_jour": "2026-09-09",
- "jours_publies": 303,
+ "dernier_jour": "2026-09-10",
+ "jours_publies": 304,
  "interruptions": [
   {
    "debut": "2026-04-29",
@@ -325,6 +325,7 @@
   "2026-09-06": "2026-09-06T08:20:56.614000+00:00",
   "2026-09-07": "2026-09-07T08:24:10.958000+00:00",
   "2026-09-08": "2026-09-08T09:34:19.802000+00:00",
-  "2026-09-09": "2026-09-09T09:32:35.561000+00:00"
+  "2026-09-09": "2026-09-09T09:32:35.561000+00:00",
+  "2026-09-10": "2026-09-10T07:07:05.521000+00:00"
  }
 }
