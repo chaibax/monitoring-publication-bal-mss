@@ -1,0 +1,663 @@
+{
+ "date": "2026-09-12",
+ "diffusion": {
+  "delai_secondes": 137,
+  "depose_le": "2026-09-12T07:35:17.598000+00:00",
+  "empreinte_miroir": "011a33086626803b7de8774a070025fb7c9f1aa9",
+  "genere_le": "2026-09-12T09:33:00",
+  "mesure": true
+ },
+ "domaines": {
+  "abaautisme.mssante.fr": [
+   13,
+   2,
+   0
+  ],
+  "adefresidences.mssante.fr": [
+   67,
+   3,
+   2
+  ],
+  "admrdesavoie.aura.mssante.fr": [
+   11,
+   2,
+   0
+  ],
+  "afl.mssante.fr": [
+   27,
+   2,
+   0
+  ],
+  "agafpa.mssante.fr": [
+   17,
+   1,
+   0
+  ],
+  "ahsm.mssante.fr": [
+   810,
+   3,
+   0
+  ],
+  "aogpe.synappse.mssante.fr": [
+   1,
+   0,
+   4
+  ],
+  "apfnormandie.mssante.fr": [
+   41,
+   2,
+   0
+  ],
+  "apfpaysdeloire.mssante.fr": [
+   126,
+   1,
+   0
+  ],
+  "aphp.mssante.fr": [
+   12538,
+   0,
+   1
+  ],
+  "associationlaruche.mssante.fr": [
+   7,
+   1,
+   0
+  ],
+  "aura.mssante.fr": [
+   62742,
+   198,
+   9
+  ],
+  "aural.aura.mssante.fr": [
+   195,
+   1,
+   0
+  ],
+  "ccas-lethor.mssante.fr": [
+   5,
+   1,
+   1
+  ],
+  "ccas.pradines.mssante.fr": [
+   3,
+   1,
+   0
+  ],
+  "ch-bourg01.aura.mssante.fr": [
+   400,
+   0,
+   1
+  ],
+  "ch-broceliande.mssante.fr": [
+   22,
+   2,
+   0
+  ],
+  "ch-chalon71.mssante.fr": [
+   1231,
+   0,
+   1
+  ],
+  "ch-dax.mssante.fr": [
+   1206,
+   2,
+   0
+  ],
+  "ch-issoudun.mssante.fr": [
+   68,
+   0,
+   1
+  ],
+  "ch-laon.mssante.fr": [
+   217,
+   1,
+   0
+  ],
+  "ch-lens.mssante.fr": [
+   240,
+   1,
+   0
+  ],
+  "ch-lezignan.mssante.fr": [
+   24,
+   1,
+   0
+  ],
+  "ch-marchant.mssante.fr": [
+   120,
+   5,
+   0
+  ],
+  "ch-marvejols.mssante.fr": [
+   21,
+   3,
+   0
+  ],
+  "ch-mauriac.aura.mssante.fr": [
+   43,
+   1,
+   0
+  ],
+  "ch-mdm.mssante.fr": [
+   369,
+   1,
+   1
+  ],
+  "ch-montlucon.mssante.fr": [
+   201,
+   2,
+   0
+  ],
+  "ch-perrens.mssante.fr": [
+   96,
+   1,
+   0
+  ],
+  "ch-privas.aura.mssante.fr": [
+   167,
+   26,
+   0
+  ],
+  "ch-stdenis.mssante.fr": [
+   262,
+   1,
+   0
+  ],
+  "ch-troyes.mssante.fr": [
+   572,
+   1,
+   2
+  ],
+  "ch-valence.aura.mssante.fr": [
+   728,
+   45,
+   0
+  ],
+  "ch-valenciennes.mssante.fr": [
+   483,
+   2,
+   0
+  ],
+  "ch-vienne.aura.mssante.fr": [
+   437,
+   1,
+   0
+  ],
+  "chba.mssante.fr": [
+   869,
+   0,
+   1
+  ],
+  "chi-val-ariege.mssante.fr": [
+   218,
+   5,
+   0
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   4902,
+   20,
+   24
+  ],
+  "chorus.mssante.fr": [
+   1227,
+   2,
+   0
+  ],
+  "chpo.aura.mssante.fr": [
+   501,
+   1,
+   0
+  ],
+  "chsa.mssante.fr": [
+   136,
+   1,
+   0
+  ],
+  "chstmarcellin.aura.mssante.fr": [
+   56,
+   40,
+   0
+  ],
+  "chu-amiens.mssante.fr": [
+   1385,
+   7,
+   0
+  ],
+  "chu-angers.mssante.fr": [
+   1433,
+   15,
+   1
+  ],
+  "chu-bordeaux.mssante.fr": [
+   2768,
+   3,
+   0
+  ],
+  "chu-brest.mssante.fr": [
+   803,
+   0,
+   1
+  ],
+  "chu-caen.mssante.fr": [
+   760,
+   0,
+   1
+  ],
+  "chu-clermontferrand.aura.mssante.fr": [
+   1253,
+   1,
+   1
+  ],
+  "chu-lyon.aura.mssante.fr": [
+   6768,
+   2,
+   1
+  ],
+  "chu-nice.mssante.fr": [
+   1216,
+   1,
+   0
+  ],
+  "chu-orleans.mssante.fr": [
+   607,
+   0,
+   1
+  ],
+  "chu-toulouse.mssante.fr": [
+   4296,
+   3,
+   0
+  ],
+  "chu-tours.mssante.fr": [
+   1515,
+   2,
+   0
+  ],
+  "chuse.aura.mssante.fr": [
+   955,
+   1,
+   1
+  ],
+  "clic.haute-ariege.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "clinique-de-la-tour.mssante.fr": [
+   13,
+   0,
+   2
+  ],
+  "clinique-saint-martin.mssante.fr": [
+   22,
+   1,
+   0
+  ],
+  "cliniques-ster.mssante.fr": [
+   17,
+   0,
+   1
+  ],
+  "cptsmarchesdebretagne.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "croix-rouge.mssante.fr": [
+   750,
+   1,
+   0
+  ],
+  "domicile90.mssante.fr": [
+   6,
+   1,
+   0
+  ],
+  "efs.mssante.fr": [
+   445,
+   1,
+   0
+  ],
+  "ehpad.oc.mssante.fr": [
+   80,
+   1,
+   0
+  ],
+  "emeis.mssante.fr": [
+   3004,
+   18,
+   2
+  ],
+  "enfance.fvdp.mssante.fr": [
+   1,
+   0,
+   1
+  ],
+  "eps-erasme.mssante.fr": [
+   67,
+   1,
+   0
+  ],
+  "epsm-marne.mssante.fr": [
+   187,
+   0,
+   1
+  ],
+  "esantepdl.mssante.fr": [
+   2154,
+   4,
+   2
+  ],
+  "fbs50.mssante.fr": [
+   240,
+   1,
+   0
+  ],
+  "filieris.mssante.fr": [
+   272,
+   1,
+   0
+  ],
+  "fondation-ove.mssante.fr": [
+   415,
+   1,
+   0
+  ],
+  "fvdp.mssante.fr": [
+   4,
+   1,
+   0
+  ],
+  "gard.mssante.fr": [
+   61,
+   0,
+   1
+  ],
+  "gh-centrebretagne.mssante.fr": [
+   353,
+   1,
+   0
+  ],
+  "gh-paulguiraud.mssante.fr": [
+   203,
+   0,
+   1
+  ],
+  "gh70.mssante.fr": [
+   347,
+   1,
+   0
+  ],
+  "ghba.mssante.fr": [
+   1308,
+   2,
+   1
+  ],
+  "ghpp.aura.mssante.fr": [
+   341,
+   44,
+   0
+  ],
+  "ght-unyon.mssante.fr": [
+   353,
+   0,
+   1
+  ],
+  "had63.aura.mssante.fr": [
+   29,
+   1,
+   0
+  ],
+  "hcs-sante.mssante.fr": [
+   572,
+   1,
+   2
+  ],
+  "hl-tournon.aura.mssante.fr": [
+   37,
+   5,
+   0
+  ],
+  "hnfc.mssante.fr": [
+   612,
+   1,
+   0
+  ],
+  "home-services.mssante.fr": [
+   29,
+   2,
+   0
+  ],
+  "hopital-joseph-ducuing.mssante.fr": [
+   154,
+   1,
+   0
+  ],
+  "hopital-lamastre.aura.mssante.fr": [
+   32,
+   6,
+   0
+  ],
+  "hopital-sevre-loire.mssante.fr": [
+   46,
+   1,
+   0
+  ],
+  "hopitaux-drome-nord.aura.mssante.fr": [
+   329,
+   26,
+   0
+  ],
+  "hospigrandouest.mssante.fr": [
+   694,
+   1,
+   0
+  ],
+  "hstv.mssante.fr": [
+   222,
+   15,
+   1
+  ],
+  "ico.unicancer.mssante.fr": [
+   240,
+   3,
+   0
+  ],
+  "infirmier.mssante.fr": [
+   16218,
+   84,
+   60
+  ],
+  "infirmier.oc.mssante.fr": [
+   2207,
+   1,
+   0
+  ],
+  "inicea.mssante.fr": [
+   1252,
+   1,
+   1
+  ],
+  "interop-mssante.apicrypt.org": [
+   24087,
+   11,
+   8
+  ],
+  "irsam.mssante.fr": [
+   47,
+   1,
+   1
+  ],
+  "isatis.asso.mssante.fr": [
+   10,
+   2,
+   0
+  ],
+  "johnbost.mssante.fr": [
+   93,
+   1,
+   0
+  ],
+  "korian.mssante.fr": [
+   673,
+   1,
+   0
+  ],
+  "lgpi.mssante.fr": [
+   3915,
+   1,
+   1
+  ],
+  "lifen.mssante.fr": [
+   15125,
+   0,
+   1
+  ],
+  "lna-sante.mssante.fr": [
+   302,
+   11,
+   0
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8166,
+   53,
+   27
+  ],
+  "masseur-kinesitherapeute.oc.mssante.fr": [
+   1068,
+   1,
+   0
+  ],
+  "mbv.mssante.fr": [
+   34,
+   1,
+   0
+  ],
+  "medecin.mssante.fr": [
+   62651,
+   100,
+   59
+  ],
+  "medecin.oc.mssante.fr": [
+   4880,
+   4,
+   1
+  ],
+  "mlezi-maore.mssante.fr": [
+   1,
+   0,
+   3
+  ],
+  "moissonsnouvelles.mssante.fr": [
+   28,
+   1,
+   0
+  ],
+  "na.mssante.fr": [
+   3672,
+   1,
+   1
+  ],
+  "nexumea.mssante.fr": [
+   20,
+   1,
+   0
+  ],
+  "o-lambret.mssante.fr": [
+   541,
+   1,
+   1
+  ],
+  "orthophoniste.mssante.fr": [
+   8887,
+   77,
+   37
+  ],
+  "paca.mssante.fr": [
+   2053,
+   1,
+   0
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1228,
+   8,
+   2
+  ],
+  "pharmacie.hdf.mssante.fr": [
+   492,
+   0,
+   1
+  ],
+  "pharmacien.mssante.fr": [
+   7297,
+   34,
+   18
+  ],
+  "pharmacien.oc.mssante.fr": [
+   2051,
+   3,
+   1
+  ],
+  "philanthropique.mssante.fr": [
+   91,
+   11,
+   0
+  ],
+  "pro.mssante.fr": [
+   24800,
+   116,
+   44
+  ],
+  "provae.mssante.fr": [
+   42,
+   1,
+   0
+  ],
+  "psychomotricien.oc.mssante.fr": [
+   222,
+   1,
+   0
+  ],
+  "psysudparis.mssante.fr": [
+   240,
+   0,
+   1
+  ],
+  "reseauapa71.mssante.fr": [
+   19,
+   0,
+   1
+  ],
+  "sad-5p.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "sage-femme.mssante.fr": [
+   5706,
+   6,
+   6
+  ],
+  "vyv3-terresdoc.mssante.fr": [
+   47,
+   2,
+   0
+  ]
+ },
+ "fetched_at": "2026-09-12T07:51:45+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 539987,
+ "modifications": null,
+ "national": {
+  "creations": 1101,
+  "suppressions": 346,
+  "total_bal": 539818
+ },
+ "par_type": {
+  "ORG": 82765,
+  "PER": 457053
+ },
+ "source_fingerprint": "b5f6f4c72090cc72a08eff2660c5723d6ed8efddd16e51bdefb01a90085f3c7d",
+ "source_timestamp": "2026-09-12T09:33:00",
+ "statut": "nominal"
+}
