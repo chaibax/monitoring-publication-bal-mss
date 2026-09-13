@@ -1,0 +1,293 @@
+{
+ "date": "2026-09-13",
+ "diffusion": {
+  "delai_secondes": 136,
+  "depose_le": "2026-09-13T07:28:16.977000+00:00",
+  "empreinte_miroir": "0f7422c5ac0bbdf29b5ad56edcc1b05eabc4a2df",
+  "genere_le": "2026-09-13T09:26:00",
+  "mesure": true
+ },
+ "domaines": {
+  "aaea-gpe.mssante.fr": [
+   27,
+   1,
+   0
+  ],
+  "admr66.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "apf.bfc.mssante.fr": [
+   82,
+   1,
+   0
+  ],
+  "arcenciel180.mssante.fr": [
+   4,
+   1,
+   0
+  ],
+  "aura.mssante.fr": [
+   62703,
+   1,
+   40
+  ],
+  "ch-alpes-leman.aura.mssante.fr": [
+   516,
+   0,
+   76
+  ],
+  "ch-cholet.mssante.fr": [
+   581,
+   1,
+   0
+  ],
+  "ch-epernay.mssante.fr": [
+   199,
+   1,
+   0
+  ],
+  "ch-ghsa.mssante.fr": [
+   47,
+   0,
+   1
+  ],
+  "ch-hopitauxduleman.aura.mssante.fr": [
+   334,
+   0,
+   23
+  ],
+  "ch-issoudun.mssante.fr": [
+   69,
+   1,
+   0
+  ],
+  "ch-mauriceselbonne.mssante.fr": [
+   18,
+   11,
+   5
+  ],
+  "ch-privas.aura.mssante.fr": [
+   136,
+   0,
+   31
+  ],
+  "ch-royan.mssante.fr": [
+   89,
+   0,
+   1
+  ],
+  "ch-troyes.mssante.fr": [
+   573,
+   1,
+   0
+  ],
+  "ch-valence.aura.mssante.fr": [
+   575,
+   0,
+   153
+  ],
+  "chcbe-gpe.mssante.fr": [
+   53,
+   20,
+   0
+  ],
+  "chgeront-gpe.mssante.fr": [
+   12,
+   1,
+   0
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   4917,
+   17,
+   2
+  ],
+  "choisy-cliniques.mssante.fr": [
+   84,
+   22,
+   0
+  ],
+  "chru-nancy.mssante.fr": [
+   1888,
+   2,
+   0
+  ],
+  "chstmarcellin.aura.mssante.fr": [
+   53,
+   0,
+   3
+  ],
+  "chu-guadeloupe.mssante.fr": [
+   417,
+   15,
+   0
+  ],
+  "chu-rouen.mssante.fr": [
+   1524,
+   14,
+   3
+  ],
+  "chu-toulouse.mssante.fr": [
+   4298,
+   2,
+   0
+  ],
+  "clinique.christina.mssante.fr": [
+   2,
+   2,
+   0
+  ],
+  "emeis.mssante.fr": [
+   3003,
+   0,
+   1
+  ],
+  "esantepdl.mssante.fr": [
+   2148,
+   2,
+   8
+  ],
+  "fede86.mssante.fr": [
+   62,
+   1,
+   0
+  ],
+  "gh-centrebretagne.mssante.fr": [
+   354,
+   1,
+   0
+  ],
+  "ghemm.mssante.fr": [
+   360,
+   0,
+   1
+  ],
+  "ghpp.aura.mssante.fr": [
+   269,
+   0,
+   72
+  ],
+  "gwasante.mssante.fr": [
+   8,
+   2,
+   5
+  ],
+  "hcs-sante.mssante.fr": [
+   573,
+   1,
+   0
+  ],
+  "hdpmb.aura.mssante.fr": [
+   248,
+   0,
+   65
+  ],
+  "hl-tournon.aura.mssante.fr": [
+   31,
+   0,
+   6
+  ],
+  "hopital-lamastre.aura.mssante.fr": [
+   29,
+   0,
+   3
+  ],
+  "hopitalnordouest.aura.mssante.fr": [
+   418,
+   0,
+   102
+  ],
+  "hopitaux-drome-nord.aura.mssante.fr": [
+   281,
+   0,
+   48
+  ],
+  "infirmier.mssante.fr": [
+   16240,
+   71,
+   49
+  ],
+  "interop-mssante.apicrypt.org": [
+   24088,
+   1,
+   0
+  ],
+  "lifen.mssante.fr": [
+   15126,
+   1,
+   0
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8189,
+   41,
+   18
+  ],
+  "medecin.mssante.fr": [
+   62679,
+   58,
+   30
+  ],
+  "mutualite-loire.aura.mssante.fr": [
+   171,
+   0,
+   55
+  ],
+  "na.mssante.fr": [
+   3671,
+   0,
+   1
+  ],
+  "orthophoniste.mssante.fr": [
+   8912,
+   34,
+   9
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1230,
+   3,
+   1
+  ],
+  "pharmacien.mssante.fr": [
+   7299,
+   15,
+   13
+  ],
+  "pro.mssante.fr": [
+   24840,
+   67,
+   27
+  ],
+  "sage-femme.mssante.fr": [
+   5711,
+   6,
+   1
+  ],
+  "ssa.mssante.fr": [
+   5479,
+   0,
+   1
+  ],
+  "udaf.mssante.fr": [
+   22,
+   1,
+   1
+  ]
+ },
+ "fetched_at": "2026-09-13T08:14:14+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 539553,
+ "modifications": null,
+ "national": {
+  "creations": 420,
+  "suppressions": 855,
+  "total_bal": 539383
+ },
+ "par_type": {
+  "ORG": 82822,
+  "PER": 456561
+ },
+ "source_fingerprint": "69871dc65dd481ad88ec3e1ccbd7c981b6894f8d1ab79a5d73d9c4e4fffc4cc0",
+ "source_timestamp": "2026-09-13T09:26:00",
+ "statut": "nominal"
+}
