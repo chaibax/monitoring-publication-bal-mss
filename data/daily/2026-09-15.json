@@ -1,0 +1,668 @@
+{
+ "date": "2026-09-15",
+ "diffusion": {
+  "delai_secondes": 145,
+  "depose_le": "2026-09-15T08:11:25.043000+00:00",
+  "empreinte_miroir": "9dae17e38d53873ebcde5318d24b6bd531fdcaf3",
+  "genere_le": "2026-09-15T10:09:00",
+  "mesure": true
+ },
+ "domaines": {
+  "acolea.aura.mssante.fr": [
+   43,
+   2,
+   0
+  ],
+  "adapei-aria.synappse.mssante.fr": [
+   103,
+   1,
+   0
+  ],
+  "aogpe.synappse.mssante.fr": [
+   5,
+   4,
+   0
+  ],
+  "apeica.mssante.fr": [
+   2,
+   1,
+   0
+  ],
+  "apf.ge.mssante.fr": [
+   85,
+   1,
+   7
+  ],
+  "apfbretagne.mssante.fr": [
+   72,
+   1,
+   0
+  ],
+  "apfhdf.mssante.fr": [
+   66,
+   3,
+   0
+  ],
+  "apfoccitanie.mssante.fr": [
+   35,
+   1,
+   0
+  ],
+  "aphp.mssante.fr": [
+   12550,
+   23,
+   11
+  ],
+  "archemc2.mssante.fr": [
+   653,
+   3,
+   0
+  ],
+  "armorsante.mssante.fr": [
+   975,
+   5,
+   2
+  ],
+  "arpdd.mssante.fr": [
+   26,
+   7,
+   0
+  ],
+  "asei.asso.mssante.fr": [
+   1524,
+   1,
+   0
+  ],
+  "aura.mssante.fr": [
+   62730,
+   35,
+   6
+  ],
+  "axigatelink.mssante.fr": [
+   711,
+   1,
+   0
+  ],
+  "biomnis.mssante.fr": [
+   49,
+   3,
+   1
+  ],
+  "ccas.pradines.mssante.fr": [
+   4,
+   1,
+   0
+  ],
+  "ch-annecygenevois.aura.mssante.fr": [
+   895,
+   0,
+   1
+  ],
+  "ch-ardeche-meridionale.aura.mssante.fr": [
+   247,
+   1,
+   0
+  ],
+  "ch-arles.mssante.fr": [
+   249,
+   1,
+   0
+  ],
+  "ch-auch.mssante.fr": [
+   162,
+   1,
+   0
+  ],
+  "ch-avignon.mssante.fr": [
+   519,
+   3,
+   1
+  ],
+  "ch-avranches-granville.mssante.fr": [
+   381,
+   171,
+   0
+  ],
+  "ch-brive.mssante.fr": [
+   328,
+   2,
+   1
+  ],
+  "ch-candelie.mssante.fr": [
+   73,
+   1,
+   0
+  ],
+  "ch-cannes.mssante.fr": [
+   385,
+   2,
+   0
+  ],
+  "ch-carpentras.mssante.fr": [
+   133,
+   1,
+   0
+  ],
+  "ch-chalon71.mssante.fr": [
+   1234,
+   3,
+   0
+  ],
+  "ch-chalonsenchampagne.mssante.fr": [
+   246,
+   1,
+   0
+  ],
+  "ch-chaumont.mssante.fr": [
+   98,
+   27,
+   0
+  ],
+  "ch-cholet.mssante.fr": [
+   579,
+   0,
+   1
+  ],
+  "ch-colmar.mssante.fr": [
+   502,
+   1,
+   0
+  ],
+  "ch-cornouaille.mssante.fr": [
+   583,
+   3,
+   1
+  ],
+  "ch-edouard-toulouse.mssante.fr": [
+   466,
+   3,
+   0
+  ],
+  "ch-epernay.mssante.fr": [
+   198,
+   0,
+   1
+  ],
+  "ch-forez.aura.mssante.fr": [
+   158,
+   1,
+   0
+  ],
+  "ch-havre.mssante.fr": [
+   648,
+   1,
+   0
+  ],
+  "ch-montfavet.mssante.fr": [
+   130,
+   4,
+   0
+  ],
+  "ch-saintdizier.mssante.fr": [
+   53,
+   1,
+   0
+  ],
+  "ch-semur.mssante.fr": [
+   127,
+   24,
+   0
+  ],
+  "ch-troyes.mssante.fr": [
+   572,
+   0,
+   1
+  ],
+  "ch-vichy.aura.mssante.fr": [
+   188,
+   1,
+   0
+  ],
+  "chbligny.mssante.fr": [
+   128,
+   0,
+   28
+  ],
+  "chic-castres-mazamet.mssante.fr": [
+   212,
+   1,
+   0
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   4877,
+   4,
+   26
+  ],
+  "chru-nancy.mssante.fr": [
+   1890,
+   2,
+   0
+  ],
+  "chsa.mssante.fr": [
+   137,
+   1,
+   0
+  ],
+  "chu-angers.mssante.fr": [
+   1444,
+   12,
+   1
+  ],
+  "chu-besancon.mssante.fr": [
+   1150,
+   1,
+   1
+  ],
+  "chu-brest.mssante.fr": [
+   802,
+   1,
+   2
+  ],
+  "chu-dijon.mssante.fr": [
+   3003,
+   17,
+   0
+  ],
+  "chu-limoges.mssante.fr": [
+   2156,
+   1,
+   1
+  ],
+  "chu-nantes.mssante.fr": [
+   3717,
+   13,
+   12
+  ],
+  "chu-reims.mssante.fr": [
+   2184,
+   1,
+   0
+  ],
+  "chu-rennes.mssante.fr": [
+   1436,
+   2,
+   0
+  ],
+  "chu-rouen.mssante.fr": [
+   1527,
+   1,
+   0
+  ],
+  "clinique-charcot.aura.mssante.fr": [
+   100,
+   0,
+   1
+  ],
+  "clinique-union.mssante.fr": [
+   13,
+   1,
+   0
+  ],
+  "cliniquedumail38.aura.mssante.fr": [
+   16,
+   1,
+   0
+  ],
+  "croix-rouge.mssante.fr": [
+   741,
+   0,
+   5
+  ],
+  "depistenfance.mssante.fr": [
+   36,
+   0,
+   2
+  ],
+  "dordogne.mssante.fr": [
+   59,
+   1,
+   0
+  ],
+  "ehpad-normandie.mssante.fr": [
+   47,
+   47,
+   0
+  ],
+  "emeis.mssante.fr": [
+   3000,
+   2,
+   5
+  ],
+  "epnak.mssante.fr": [
+   107,
+   6,
+   1
+  ],
+  "esantepdl.mssante.fr": [
+   2144,
+   4,
+   6
+  ],
+  "fhm.mssante.fr": [
+   150,
+   1,
+   1
+  ],
+  "ftem.mssante.fr": [
+   7,
+   0,
+   1
+  ],
+  "gh-centrebretagne.mssante.fr": [
+   355,
+   1,
+   0
+  ],
+  "ghemm.mssante.fr": [
+   362,
+   2,
+   0
+  ],
+  "ghicl.mssante.fr": [
+   627,
+   1,
+   0
+  ],
+  "ghm-grenoble.aura.mssante.fr": [
+   242,
+   0,
+   1
+  ],
+  "ghso.mssante.fr": [
+   180,
+   1,
+   0
+  ],
+  "godinot.mssante.fr": [
+   431,
+   1,
+   0
+  ],
+  "groupesos.mssante.fr": [
+   416,
+   1,
+   0
+  ],
+  "hcs-sante.mssante.fr": [
+   572,
+   0,
+   1
+  ],
+  "hl-caussade.mssante.fr": [
+   13,
+   1,
+   0
+  ],
+  "hnfc.mssante.fr": [
+   613,
+   1,
+   0
+  ],
+  "hopital-levesinet.mssante.fr": [
+   39,
+   1,
+   0
+  ],
+  "hopitauxvesubie.mssante.fr": [
+   2,
+   1,
+   1
+  ],
+  "hospigrandouest.mssante.fr": [
+   693,
+   0,
+   1
+  ],
+  "hstv.mssante.fr": [
+   221,
+   2,
+   3
+  ],
+  "imm.mssante.fr": [
+   393,
+   1,
+   0
+  ],
+  "infirmier.mssante.fr": [
+   16184,
+   53,
+   59
+  ],
+  "infirmier.oc.mssante.fr": [
+   2199,
+   5,
+   0
+  ],
+  "inicea.mssante.fr": [
+   1254,
+   2,
+   0
+  ],
+  "inoviegroup.mssante.fr": [
+   945,
+   0,
+   3
+  ],
+  "interop-mssante.apicrypt.org": [
+   24088,
+   9,
+   9
+  ],
+  "johnbost.mssante.fr": [
+   93,
+   1,
+   1
+  ],
+  "korian.mssante.fr": [
+   673,
+   3,
+   1
+  ],
+  "lapergola.elsan.mssante.fr": [
+   13,
+   13,
+   0
+  ],
+  "les-capucins-angers.mssante.fr": [
+   67,
+   18,
+   0
+  ],
+  "lgpi.mssante.fr": [
+   3916,
+   2,
+   0
+  ],
+  "lifen.mssante.fr": [
+   15129,
+   3,
+   0
+  ],
+  "limousin.mssante.fr": [
+   295,
+   0,
+   1
+  ],
+  "lna-sante.mssante.fr": [
+   303,
+   1,
+   0
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8140,
+   10,
+   38
+  ],
+  "masseur-kinesitherapeute.oc.mssante.fr": [
+   1067,
+   2,
+   0
+  ],
+  "medecin.mssante.fr": [
+   62641,
+   42,
+   54
+  ],
+  "medecin.oc.mssante.fr": [
+   4873,
+   4,
+   0
+  ],
+  "medicall.mssante.fr": [
+   36,
+   0,
+   1
+  ],
+  "medistory.mssante.fr": [
+   604,
+   0,
+   2
+  ],
+  "na.mssante.fr": [
+   3672,
+   2,
+   0
+  ],
+  "nephrocare.mssante.fr": [
+   193,
+   75,
+   0
+  ],
+  "opticiens.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "orsac-montfleuri.mssante.fr": [
+   24,
+   3,
+   0
+  ],
+  "orthophoniste.mssante.fr": [
+   8854,
+   11,
+   41
+  ],
+  "orthophoniste.oc.mssante.fr": [
+   768,
+   2,
+   0
+  ],
+  "paca.mssante.fr": [
+   2051,
+   2,
+   0
+  ],
+  "paliped.mssante.fr": [
+   3,
+   1,
+   1
+  ],
+  "papillonsblancs29.mssante.fr": [
+   90,
+   2,
+   0
+  ],
+  "pasdecalais.mssante.fr": [
+   191,
+   1,
+   0
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1220,
+   0,
+   5
+  ],
+  "pharmacie-paca.mssante.fr": [
+   1515,
+   1,
+   0
+  ],
+  "pharmacie.hdf.mssante.fr": [
+   490,
+   1,
+   0
+  ],
+  "pharmacien.mssante.fr": [
+   7278,
+   4,
+   17
+  ],
+  "pharmacien.oc.mssante.fr": [
+   2049,
+   8,
+   1
+  ],
+  "polyclinique-rillieux.aura.mssante.fr": [
+   19,
+   1,
+   0
+  ],
+  "pro.mssante.fr": [
+   24749,
+   32,
+   66
+  ],
+  "progisap.mssante.fr": [
+   41,
+   6,
+   0
+  ],
+  "psychologue.oc.mssante.fr": [
+   348,
+   1,
+   0
+  ],
+  "resrip.mssante.fr": [
+   6,
+   1,
+   1
+  ],
+  "routenouvelle.mssante.fr": [
+   10,
+   1,
+   0
+  ],
+  "sage-femme.mssante.fr": [
+   5710,
+   4,
+   5
+  ],
+  "simt.mssante.fr": [
+   43,
+   1,
+   0
+  ],
+  "smr-valeriane.mssante.fr": [
+   4,
+   3,
+   0
+  ],
+  "sos-medecins.mssante.fr": [
+   253,
+   1,
+   0
+  ],
+  "ssraleboy.mssante.fr": [
+   8,
+   1,
+   1
+  ]
+ },
+ "fetched_at": "2026-09-15T08:36:14+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 539486,
+ "modifications": null,
+ "national": {
+  "creations": 814,
+  "suppressions": 441,
+  "total_bal": 539316
+ },
+ "par_type": {
+  "ORG": 83178,
+  "PER": 456138
+ },
+ "source_fingerprint": "eec06f595a8ee7eb2082b17b27224eefe9e3b549ae5e57a5012406ac50f08d6b",
+ "source_timestamp": "2026-09-15T10:09:00",
+ "statut": "nominal"
+}
