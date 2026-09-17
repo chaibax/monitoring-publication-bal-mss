@@ -1,0 +1,668 @@
+{
+ "date": "2026-09-17",
+ "diffusion": {
+  "delai_secondes": 161,
+  "depose_le": "2026-09-17T07:57:41.799000+00:00",
+  "empreinte_miroir": "e9b70cf08a2ae66513bc89f40ee954c2bb84f09c",
+  "genere_le": "2026-09-17T09:55:00",
+  "mesure": true
+ },
+ "domaines": {
+  "acolea.aura.mssante.fr": [
+   46,
+   2,
+   2
+  ],
+  "admr26.aura.mssante.fr": [
+   83,
+   7,
+   0
+  ],
+  "adpc.mssante.fr": [
+   73,
+   1,
+   0
+  ],
+  "agiradom.mssante.fr": [
+   87,
+   1,
+   0
+  ],
+  "ahnac.mssante.fr": [
+   653,
+   2,
+   3
+  ],
+  "amities-armor.mssante.fr": [
+   21,
+   2,
+   0
+  ],
+  "apeer.mssante.fr": [
+   18,
+   18,
+   0
+  ],
+  "apfhdf.mssante.fr": [
+   70,
+   2,
+   0
+  ],
+  "armorsante.mssante.fr": [
+   976,
+   1,
+   1
+  ],
+  "asei.asso.mssante.fr": [
+   1526,
+   2,
+   0
+  ],
+  "astil62.mssante.fr": [
+   51,
+   1,
+   0
+  ],
+  "aura.mssante.fr": [
+   62786,
+   26,
+   4
+  ],
+  "axigatelink.mssante.fr": [
+   715,
+   2,
+   0
+  ],
+  "ccas.pradines.mssante.fr": [
+   6,
+   2,
+   0
+  ],
+  "cgm.mssante.fr": [
+   13535,
+   0,
+   2
+  ],
+  "ch-alencon.mssante.fr": [
+   316,
+   1,
+   0
+  ],
+  "ch-argenteuil.mssante.fr": [
+   398,
+   1,
+   0
+  ],
+  "ch-auch.mssante.fr": [
+   162,
+   1,
+   1
+  ],
+  "ch-avranches-granville.mssante.fr": [
+   381,
+   13,
+   13
+  ],
+  "ch-boulay.mssante.fr": [
+   11,
+   1,
+   0
+  ],
+  "ch-castelnaudary.mssante.fr": [
+   43,
+   1,
+   0
+  ],
+  "ch-chalon71.mssante.fr": [
+   1235,
+   1,
+   0
+  ],
+  "ch-chalonsenchampagne.mssante.fr": [
+   247,
+   1,
+   0
+  ],
+  "ch-despinoy.mssante.fr": [
+   32,
+   0,
+   1
+  ],
+  "ch-digne.mssante.fr": [
+   55,
+   2,
+   0
+  ],
+  "ch-esquirol.mssante.fr": [
+   615,
+   1,
+   0
+  ],
+  "ch-guillaumeregnier.mssante.fr": [
+   308,
+   76,
+   0
+  ],
+  "ch-havre.mssante.fr": [
+   647,
+   0,
+   1
+  ],
+  "ch-le-vinatier.aura.mssante.fr": [
+   350,
+   1,
+   0
+  ],
+  "ch-lens.mssante.fr": [
+   243,
+   3,
+   0
+  ],
+  "ch-libourne.mssante.fr": [
+   297,
+   1,
+   0
+  ],
+  "ch-morlaix.mssante.fr": [
+   703,
+   0,
+   2
+  ],
+  "ch-nanterre.mssante.fr": [
+   134,
+   0,
+   2
+  ],
+  "ch-poitiers.mssante.fr": [
+   467,
+   1,
+   0
+  ],
+  "ch-privas.aura.mssante.fr": [
+   137,
+   1,
+   0
+  ],
+  "ch-saintnazaire.mssante.fr": [
+   600,
+   2,
+   2
+  ],
+  "ch-simoneveil.mssante.fr": [
+   341,
+   3,
+   0
+  ],
+  "ch-stefoy.mssante.fr": [
+   24,
+   1,
+   0
+  ],
+  "ch-stflour.aura.mssante.fr": [
+   10,
+   2,
+   0
+  ],
+  "ch-stlo.mssante.fr": [
+   558,
+   0,
+   1
+  ],
+  "ch-tarbes-lourdes.mssante.fr": [
+   109,
+   2,
+   0
+  ],
+  "ch-valenciennes.mssante.fr": [
+   485,
+   2,
+   0
+  ],
+  "ch-vienne.aura.mssante.fr": [
+   438,
+   1,
+   0
+  ],
+  "cham.aura.mssante.fr": [
+   178,
+   1,
+   0
+  ],
+  "chca.aura.mssante.fr": [
+   63,
+   1,
+   0
+  ],
+  "cheygurande.mssante.fr": [
+   71,
+   1,
+   0
+  ],
+  "chimr.mssante.fr": [
+   7,
+   1,
+   0
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   4922,
+   39,
+   4
+  ],
+  "chph01.aura.mssante.fr": [
+   26,
+   0,
+   1
+  ],
+  "chru-nancy.mssante.fr": [
+   1891,
+   1,
+   0
+  ],
+  "chu-angers.mssante.fr": [
+   1535,
+   76,
+   0
+  ],
+  "chu-bordeaux.mssante.fr": [
+   2767,
+   1,
+   1
+  ],
+  "chu-dijon.mssante.fr": [
+   3007,
+   1,
+   0
+  ],
+  "chu-lyon.aura.mssante.fr": [
+   6769,
+   1,
+   0
+  ],
+  "chu-montpellier.mssante.fr": [
+   1183,
+   3,
+   0
+  ],
+  "chu-nice.mssante.fr": [
+   1218,
+   2,
+   0
+  ],
+  "chu-nimes.mssante.fr": [
+   1195,
+   1,
+   0
+  ],
+  "chu-poitiers.mssante.fr": [
+   1189,
+   1,
+   0
+  ],
+  "chu-rennes.mssante.fr": [
+   1439,
+   3,
+   0
+  ],
+  "chu-rouen.mssante.fr": [
+   1535,
+   5,
+   0
+  ],
+  "chu-toulouse.mssante.fr": [
+   4298,
+   1,
+   0
+  ],
+  "chvallon.aura.mssante.fr": [
+   14,
+   3,
+   0
+  ],
+  "cli.elsan.mssante.fr": [
+   19,
+   14,
+   0
+  ],
+  "cliniquecanopee-rainbow.mssante.fr": [
+   2,
+   1,
+   0
+  ],
+  "cpts78nord.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "cptsmontreuil93.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "dac54.mssante.fr": [
+   48,
+   1,
+   1
+  ],
+  "departement13.mssante.fr": [
+   153,
+   2,
+   0
+  ],
+  "domicile90.mssante.fr": [
+   10,
+   4,
+   0
+  ],
+  "emeis.mssante.fr": [
+   3012,
+   8,
+   1
+  ],
+  "epione-prevention.mssante.fr": [
+   29,
+   0,
+   1
+  ],
+  "epnak.mssante.fr": [
+   112,
+   3,
+   0
+  ],
+  "esantepdl.mssante.fr": [
+   2160,
+   16,
+   6
+  ],
+  "fondation-hopale.mssante.fr": [
+   63,
+   62,
+   0
+  ],
+  "fondation-ove.mssante.fr": [
+   412,
+   1,
+   0
+  ],
+  "fondation-santeservice.mssante.fr": [
+   216,
+   1,
+   0
+  ],
+  "gammes.mssante.fr": [
+   9,
+   1,
+   0
+  ],
+  "ghicl.mssante.fr": [
+   628,
+   1,
+   0
+  ],
+  "ghlh.mssante.fr": [
+   66,
+   0,
+   1
+  ],
+  "ght-coeurgrandest.mssante.fr": [
+   32,
+   1,
+   0
+  ],
+  "ght-novo.mssante.fr": [
+   462,
+   1,
+   0
+  ],
+  "ght85.mssante.fr": [
+   908,
+   0,
+   1
+  ],
+  "ghtnievre.mssante.fr": [
+   150,
+   1,
+   0
+  ],
+  "ghu-paris.mssante.fr": [
+   644,
+   1,
+   0
+  ],
+  "ghvl.mssante.fr": [
+   8,
+   1,
+   0
+  ],
+  "grandir-en-couleur.mssante.fr": [
+   23,
+   1,
+   0
+  ],
+  "groupe-adene.mssante.fr": [
+   51,
+   0,
+   1
+  ],
+  "gustaveroussy.mssante.fr": [
+   631,
+   1,
+   0
+  ],
+  "hli-presquile.mssante.fr": [
+   61,
+   1,
+   1
+  ],
+  "hnfc.mssante.fr": [
+   615,
+   2,
+   0
+  ],
+  "hopital-mortain.mssante.fr": [
+   5,
+   5,
+   0
+  ],
+  "hstv.mssante.fr": [
+   222,
+   1,
+   0
+  ],
+  "icm46.mssante.fr": [
+   73,
+   3,
+   0
+  ],
+  "ildys.mssante.fr": [
+   119,
+   1,
+   0
+  ],
+  "imm.mssante.fr": [
+   394,
+   1,
+   0
+  ],
+  "infirmier.mssante.fr": [
+   16280,
+   73,
+   24
+  ],
+  "interop-mssante.apicrypt.org": [
+   24085,
+   4,
+   6
+  ],
+  "isatis.asso.mssante.fr": [
+   11,
+   1,
+   0
+  ],
+  "laposte.mssante.fr": [
+   592,
+   3,
+   0
+  ],
+  "lgpi.mssante.fr": [
+   3916,
+   0,
+   2
+  ],
+  "lifen.mssante.fr": [
+   15127,
+   2,
+   4
+  ],
+  "lna-sante.mssante.fr": [
+   302,
+   0,
+   1
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8216,
+   61,
+   7
+  ],
+  "medecin.mssante.fr": [
+   62805,
+   126,
+   19
+  ],
+  "medecin.oc.mssante.fr": [
+   4878,
+   2,
+   1
+  ],
+  "medquake.mssante.fr": [
+   2,
+   1,
+   0
+  ],
+  "na.mssante.fr": [
+   3673,
+   1,
+   1
+  ],
+  "normandie.mssante.fr": [
+   176,
+   1,
+   0
+  ],
+  "orpea.mssante.fr": [
+   23,
+   0,
+   1
+  ],
+  "orthophoniste.mssante.fr": [
+   8939,
+   75,
+   4
+  ],
+  "orthophoniste.oc.mssante.fr": [
+   772,
+   1,
+   0
+  ],
+  "paca.mssante.fr": [
+   2051,
+   1,
+   1
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1229,
+   5,
+   1
+  ],
+  "pharmacie-paca.mssante.fr": [
+   1519,
+   4,
+   0
+  ],
+  "pharmacien.mssante.fr": [
+   7320,
+   36,
+   13
+  ],
+  "pharmacien.oc.mssante.fr": [
+   2055,
+   1,
+   0
+  ],
+  "pharmacrypt.mssante.fr": [
+   438,
+   1,
+   0
+  ],
+  "polesantetravail41.mssante.fr": [
+   13,
+   2,
+   0
+  ],
+  "prevaly.mssante.fr": [
+   155,
+   1,
+   0
+  ],
+  "pro.mssante.fr": [
+   24880,
+   106,
+   22
+  ],
+  "pst35.mssante.fr": [
+   131,
+   2,
+   0
+  ],
+  "sage-femme.mssante.fr": [
+   5722,
+   6,
+   2
+  ],
+  "sist79.mssante.fr": [
+   59,
+   2,
+   0
+  ],
+  "sos-medecins.mssante.fr": [
+   252,
+   0,
+   1
+  ],
+  "ugecam-alpc.cnamts.mssante.fr": [
+   72,
+   1,
+   0
+  ],
+  "ugecam-pacac.mssante.fr": [
+   124,
+   1,
+   0
+  ],
+  "unapei34.mssante.fr": [
+   59,
+   1,
+   1
+  ],
+  "unapei60.mssante.fr": [
+   128,
+   1,
+   0
+  ]
+ },
+ "fetched_at": "2026-09-17T08:34:57+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 540851,
+ "modifications": null,
+ "national": {
+  "creations": 990,
+  "suppressions": 165,
+  "total_bal": 540681
+ },
+ "par_type": {
+  "ORG": 83526,
+  "PER": 457155
+ },
+ "source_fingerprint": "57fe241bd11bfaf4a913858c7b80fe3d5338657f1c10e664ad19297c09a37874",
+ "source_timestamp": "2026-09-17T09:55:00",
+ "statut": "nominal"
+}
