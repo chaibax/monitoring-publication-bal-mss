@@ -1,0 +1,183 @@
+{
+ "date": "2026-09-20",
+ "diffusion": {
+  "delai_secondes": 181,
+  "depose_le": "2026-09-20T07:17:01.305000+00:00",
+  "empreinte_miroir": "86635cb36a305e88c595e697e016dcaeab398e3a",
+  "genere_le": "2026-09-20T09:14:00",
+  "mesure": true
+ },
+ "domaines": {
+  "apeidorange.mssante.fr": [
+   32,
+   8,
+   0
+  ],
+  "ars.occitanie.mssante.fr": [
+   35,
+   1,
+   0
+  ],
+  "arseaa.mssante.fr": [
+   158,
+   1,
+   0
+  ],
+  "ch-cannes.mssante.fr": [
+   386,
+   1,
+   0
+  ],
+  "ch-cholet.mssante.fr": [
+   577,
+   1,
+   0
+  ],
+  "ch-coutances.mssante.fr": [
+   120,
+   0,
+   1
+  ],
+  "ch-troyes.mssante.fr": [
+   576,
+   1,
+   0
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   4943,
+   20,
+   21
+  ],
+  "chsa.mssante.fr": [
+   138,
+   1,
+   0
+  ],
+  "chu-orleans.mssante.fr": [
+   604,
+   0,
+   1
+  ],
+  "chu-reims.mssante.fr": [
+   2184,
+   1,
+   0
+  ],
+  "chu-rouen.mssante.fr": [
+   1532,
+   1,
+   0
+  ],
+  "chu-toulouse.mssante.fr": [
+   7683,
+   3392,
+   12
+  ],
+  "cliniquenev.mssante.fr": [
+   24,
+   1,
+   0
+  ],
+  "curie.mssante.fr": [
+   472,
+   2,
+   0
+  ],
+  "cvl.mssante.fr": [
+   1514,
+   0,
+   1
+  ],
+  "esantepdl.mssante.fr": [
+   2157,
+   1,
+   11
+  ],
+  "hcs-sante.mssante.fr": [
+   576,
+   1,
+   0
+  ],
+  "infirmier.mssante.fr": [
+   16345,
+   61,
+   70
+  ],
+  "interop-mssante.apicrypt.org": [
+   24088,
+   0,
+   1
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8258,
+   41,
+   54
+  ],
+  "medecin.mssante.fr": [
+   62933,
+   62,
+   74
+  ],
+  "na.mssante.fr": [
+   3673,
+   0,
+   1
+  ],
+  "orthophoniste.mssante.fr": [
+   8977,
+   25,
+   54
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1227,
+   5,
+   8
+  ],
+  "pharmacie-normandie.mssante.fr": [
+   317,
+   0,
+   1
+  ],
+  "pharmacien.mssante.fr": [
+   7367,
+   25,
+   20
+  ],
+  "philanthropique.mssante.fr": [
+   93,
+   0,
+   1
+  ],
+  "pro.mssante.fr": [
+   24964,
+   70,
+   81
+  ],
+  "sage-femme.mssante.fr": [
+   5736,
+   4,
+   3
+  ],
+  "ssa.mssante.fr": [
+   5480,
+   0,
+   2
+  ]
+ },
+ "fetched_at": "2026-09-20T08:30:30+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 545307,
+ "modifications": null,
+ "national": {
+  "creations": 3726,
+  "suppressions": 417,
+  "total_bal": 545135
+ },
+ "par_type": {
+  "ORG": 83998,
+  "PER": 461137
+ },
+ "source_fingerprint": "a24596638afac8acc05f5742dd7b9f6e359719381baeabc7934b9d8a4a8d3078",
+ "source_timestamp": "2026-09-20T09:14:00",
+ "statut": "nominal"
+}
