@@ -1,0 +1,288 @@
+{
+ "date": "2026-09-27",
+ "diffusion": {
+  "delai_secondes": 143,
+  "depose_le": "2026-09-27T08:05:23.915000+00:00",
+  "empreinte_miroir": "661f4e500fd789781f76e6a3ad9f9b590768cd33",
+  "genere_le": "2026-09-27T10:03:00",
+  "mesure": true
+ },
+ "domaines": {
+  "aedps.mssante.fr": [
+   8,
+   5,
+   0
+  ],
+  "agduc.aura.mssante.fr": [
+   196,
+   0,
+   1
+  ],
+  "apas82.mssante.fr": [
+   17,
+   0,
+   1
+  ],
+  "aspha.services.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "aura.mssante.fr": [
+   62867,
+   2,
+   3
+  ],
+  "cds-langogne.mssante.fr": [
+   3,
+   3,
+   0
+  ],
+  "ch-dax.mssante.fr": [
+   1223,
+   2,
+   0
+  ],
+  "ch-dromevivarais.aura.mssante.fr": [
+   117,
+   1,
+   0
+  ],
+  "ch-edouard-toulouse.mssante.fr": [
+   464,
+   0,
+   1
+  ],
+  "ch-lerouvray.mssante.fr": [
+   238,
+   1,
+   0
+  ],
+  "ch-millau.mssante.fr": [
+   47,
+   0,
+   1
+  ],
+  "ch-ponteils.mssante.fr": [
+   12,
+   1,
+   0
+  ],
+  "ch-stlo.mssante.fr": [
+   554,
+   0,
+   1
+  ],
+  "ch-troyes.mssante.fr": [
+   581,
+   3,
+   1
+  ],
+  "ch-valence.aura.mssante.fr": [
+   578,
+   1,
+   0
+  ],
+  "ch-vienne.aura.mssante.fr": [
+   439,
+   1,
+   0
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   4951,
+   21,
+   21
+  ],
+  "chu-angers.mssante.fr": [
+   1599,
+   0,
+   1
+  ],
+  "chu-lyon.aura.mssante.fr": [
+   6768,
+   9,
+   1
+  ],
+  "chu-nice.mssante.fr": [
+   1215,
+   1,
+   0
+  ],
+  "chu-rouen.mssante.fr": [
+   1532,
+   1,
+   0
+  ],
+  "chu-toulouse.mssante.fr": [
+   8162,
+   494,
+   20
+  ],
+  "clb.aura.mssante.fr": [
+   444,
+   1,
+   0
+  ],
+  "cmsea.mssante.fr": [
+   2,
+   2,
+   0
+  ],
+  "emeis.mssante.fr": [
+   3021,
+   3,
+   0
+  ],
+  "ensemble08.mssante.fr": [
+   5,
+   5,
+   0
+  ],
+  "esantepdl.mssante.fr": [
+   2157,
+   1,
+   19
+  ],
+  "gh-centrebretagne.mssante.fr": [
+   362,
+   5,
+   0
+  ],
+  "ghemm.mssante.fr": [
+   364,
+   1,
+   0
+  ],
+  "hcs-sante.mssante.fr": [
+   581,
+   3,
+   1
+  ],
+  "icm46.mssante.fr": [
+   74,
+   0,
+   1
+  ],
+  "icp.aura.mssante.fr": [
+   480,
+   1,
+   0
+  ],
+  "imm.mssante.fr": [
+   394,
+   0,
+   1
+  ],
+  "infirmier.mssante.fr": [
+   16470,
+   63,
+   67
+  ],
+  "interop-mssante.apicrypt.org": [
+   24041,
+   1,
+   1
+  ],
+  "lifen.mssante.fr": [
+   15108,
+   2,
+   5
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8325,
+   42,
+   61
+  ],
+  "medecin.mssante.fr": [
+   63191,
+   54,
+   55
+  ],
+  "orthophoniste.mssante.fr": [
+   9075,
+   30,
+   38
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1235,
+   5,
+   8
+  ],
+  "pharmacien.mssante.fr": [
+   7450,
+   28,
+   18
+  ],
+  "pro.mssante.fr": [
+   25142,
+   83,
+   88
+  ],
+  "sage-femme.mssante.fr": [
+   5766,
+   5,
+   3
+  ],
+  "ssa.mssante.fr": [
+   5450,
+   0,
+   10
+  ],
+  "udaf-cmppemeraude.mssante.fr": [
+   4,
+   4,
+   0
+  ],
+  "udaf-mas971.mssante.fr": [
+   2,
+   2,
+   0
+  ],
+  "udaf-samsah97100.mssante.fr": [
+   2,
+   2,
+   0
+  ],
+  "udaf-samsah97110.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "udaf-savs97100.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "udaf-savs97110.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "udaf-sessademeraude.mssante.fr": [
+   3,
+   3,
+   0
+  ],
+  "valdouest.aura.mssante.fr": [
+   56,
+   1,
+   0
+  ]
+ },
+ "fetched_at": "2026-09-27T09:10:05+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 547244,
+ "modifications": null,
+ "national": {
+  "creations": 897,
+  "suppressions": 428,
+  "total_bal": 547073
+ },
+ "par_type": {
+  "ORG": 84768,
+  "PER": 462305
+ },
+ "source_fingerprint": "ab09979837b59f354e4bdea940c9478ffa5ca3d1abf43586589f1704e4827ae7",
+ "source_timestamp": "2026-09-27T10:03:00",
+ "statut": "nominal"
+}
