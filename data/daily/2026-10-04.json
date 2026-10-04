@@ -1,0 +1,93 @@
+{
+ "date": "2026-10-04",
+ "diffusion": {
+  "delai_secondes": 142,
+  "depose_le": "2026-10-04T00:50:22.001000+00:00",
+  "empreinte_miroir": "17ef508143c1c9e8c0c3d599913fe2d2b94bbd49",
+  "genere_le": "2026-10-04T02:48:00",
+  "mesure": true
+ },
+ "domaines": {
+  "aura.mssante.fr": [
+   62920,
+   0,
+   2
+  ],
+  "ch-chaumont.mssante.fr": [
+   97,
+   1,
+   0
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   4977,
+   0,
+   1
+  ],
+  "chu-nantes.mssante.fr": [
+   3725,
+   0,
+   1
+  ],
+  "chu-poitiers.mssante.fr": [
+   1188,
+   0,
+   1
+  ],
+  "emeis.mssante.fr": [
+   3041,
+   1,
+   0
+  ],
+  "ico.unicancer.mssante.fr": [
+   241,
+   1,
+   0
+  ],
+  "lgpi.mssante.fr": [
+   3926,
+   0,
+   1
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8409,
+   0,
+   2
+  ],
+  "medecin.mssante.fr": [
+   63412,
+   0,
+   5
+  ],
+  "medecin.oc.mssante.fr": [
+   4844,
+   1,
+   1
+  ],
+  "pharmacie.hdf.mssante.fr": [
+   493,
+   0,
+   1
+  ],
+  "pharmacien.mssante.fr": [
+   7458,
+   1,
+   0
+  ]
+ },
+ "fetched_at": "2026-10-04T09:38:13+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 555006,
+ "modifications": null,
+ "national": {
+  "creations": 5,
+  "suppressions": 15,
+  "total_bal": 554833
+ },
+ "par_type": {
+  "ORG": 91568,
+  "PER": 463265
+ },
+ "source_fingerprint": "0b9b23e2941ebd6ccf564806973a824a9c3e0ed1964fab9deb2e8b17afa5dade",
+ "source_timestamp": "2026-10-04T02:48:00",
+ "statut": "nominal"
+}
