@@ -1,0 +1,38 @@
+{
+ "date": "2026-10-05",
+ "diffusion": {
+  "delai_secondes": 134,
+  "depose_le": "2026-10-05T00:50:14.350000+00:00",
+  "empreinte_miroir": "fcdaa4e8fa6f01afe6be062ccd62d15f29611c24",
+  "genere_le": "2026-10-05T02:48:00",
+  "mesure": true
+ },
+ "domaines": {
+  "medecin.mssante.fr": [
+   63417,
+   5,
+   0
+  ],
+  "pharmacrypt.mssante.fr": [
+   441,
+   0,
+   1
+  ]
+ },
+ "fetched_at": "2026-10-05T10:18:33+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 555010,
+ "modifications": null,
+ "national": {
+  "creations": 5,
+  "suppressions": 1,
+  "total_bal": 554837
+ },
+ "par_type": {
+  "ORG": 91567,
+  "PER": 463270
+ },
+ "source_fingerprint": "cd5a4beafcc0d865a27cc1a19b3108dfae98a9192d24e75c18ccd4a809c0704e",
+ "source_timestamp": "2026-10-05T02:48:00",
+ "statut": "nominal"
+}
