@@ -99,12 +99,6 @@ function etatDiffusion(dernier) {
     génération par l'ANS.`];
 }
 
-function etatRestitution() {
-  return ["indisponible", `Les sondes témoins ne sont pas encore en service. Aucune
-    mesure n'est disponible pour ce maillon : un état favorable affiché faute de mesure
-    serait un mensonge par omission.`];
-}
-
 /* ---------- Chronologie ---------- */
 
 function derniersJours(n, finIso) {
@@ -315,6 +309,83 @@ function rendreJournal(calendrier) {
     qualifie ni la cause ni la responsabilité.</p>`;
 }
 
+/* ---------- Retraits ---------- */
+
+/* Événements extérieurs dont on veut lire l'effet sur la série. Un repère
+   date un fait, il n'attribue aucune variation à ce fait. */
+const REPERES = {
+  "2026-09-23": "e-mailing aux médecins ayant une BAL en double",
+};
+
+function moyenne(valeurs) {
+  return valeurs.length ? Math.round(valeurs.reduce((s, v) => s + v, 0) / valeurs.length) : null;
+}
+
+function rendreRetraits(agregats, aujourdhui) {
+  const jours = derniersJours(JOURS_CHRONO, aujourdhui);
+  const valeurDe = (j) => (agregats[j] && agregats[j].national.suppressions !== null
+    && agregats[j].national.suppressions !== undefined) ? agregats[j].national.suppressions : null;
+  const mesures = jours.map(valeurDe);
+  const connus = mesures.filter((v) => v !== null);
+
+  if (!connus.length) {
+    $("retraits").innerHTML = `<div class="histo-vide"><p class="fr-mb-0">Aucun retrait mesuré
+      sur la période.</p></div>`;
+    $("retraits-texte").innerHTML = "";
+    $("retraits-synthese").innerHTML = "";
+    return;
+  }
+
+  const max = Math.max(...connus, 1);
+  const colonnes = jours.map((j, i) => {
+    const v = mesures[i];
+    const d = new Date(j + "T12:00:00");
+    const etiquette = d.getDate() === 1
+      ? `1<span class="chrono-mois">${MOIS_COURT.format(d).replace(".", "")}</span>` : d.getDate();
+    const repere = REPERES[j];
+    // Sur petit écran, trente numéros se chevauchent : seuls restent le
+    // premier du mois, les multiples de cinq et les jours repérés.
+    const secondaire = !repere && d.getDate() !== 1 && d.getDate() % 5 !== 0;
+    let barre;
+    if (v === null) barre = `<div class="histo-barre manquante"></div>`;
+    else if (v === 0) barre = `<div class="histo-barre nulle"></div>`;
+    else barre = `<div class="histo-barre retrait" style="height:${Math.max(2, (v / max) * 100)}%"></div>`;
+    const texte = v === null ? "données manquantes" : `${nf.format(v)} adresses retirées`;
+    return `<div class="serie-col${repere ? " repere" : ""}"
+      title="${jourDe(j)} — ${texte}${repere ? " · " + repere : ""}">
+      <div class="serie-zone">${barre}</div>
+      <span class="chrono-etiquette${secondaire ? " secondaire" : ""}" aria-hidden="true">${etiquette}</span></div>`;
+  }).join("");
+
+  const reperes = Object.entries(REPERES).filter(([j]) => jours.includes(j));
+  $("retraits").innerHTML = `<div class="serie" role="img"
+      aria-label="Adresses retirées par jour, du ${jourDe(jours[0])} au ${jourDe(jours[jours.length - 1])}">
+      ${colonnes}</div>` +
+    (reperes.length ? `<p class="fr-text--xs fr-mt-1w fr-mb-0 legende-repere">` +
+      reperes.map(([j, quoi]) => `<span class="marque-repere" aria-hidden="true"></span>${jourDe(j)}&nbsp;: ${quoi}`).join("<br>") +
+      `</p>` : "");
+
+  $("retraits-texte").innerHTML = "<ul>" + jours.map((j, i) =>
+    `<li>${jourDe(j)} : ${mesures[i] === null ? "données manquantes" : nf.format(mesures[i])}${REPERES[j] ? " — " + REPERES[j] : ""}</li>`
+  ).join("") + "</ul>";
+
+  // Comparaison avant / depuis le premier repère, sur des durées égales :
+  // la moyenne ne porte que sur les jours effectivement mesurés.
+  const [premier] = Object.keys(REPERES).sort();
+  if (!premier || premier > aujourdhui) { $("retraits-synthese").innerHTML = ""; return; }
+  const apres = Object.keys(agregats).filter((j) => j >= premier && j <= aujourdhui).sort();
+  const n = apres.length;
+  const avant = Object.keys(agregats).filter((j) => j < premier).sort().slice(-n);
+  const valeurs = (liste) => liste.map(valeurDe).filter((v) => v !== null);
+  const mAvant = moyenne(valeurs(avant)), mApres = moyenne(valeurs(apres));
+  const total = valeurs(apres).reduce((s, v) => s + v, 0);
+  $("retraits-synthese").innerHTML = (mAvant === null || mApres === null) ? "" :
+    `Depuis le ${jourDe(premier)}&nbsp;: <b>${nf.format(total)}</b> adresses retirées en
+     ${valeurs(apres).length} jours mesurés, soit <b>${nf.format(mApres)}</b> par jour en moyenne,
+     contre <b>${nf.format(mAvant)}</b> par jour sur les ${valeurs(avant).length} jours mesurés
+     qui précèdent.`;
+}
+
 /* ---------- Tuiles ---------- */
 
 function tuile(valeur, libelle, source) {
@@ -348,8 +419,7 @@ async function demarrer() {
     $("fraicheur").innerHTML = `<b>Les relevés n'ont pas pu être chargés.</b> L'outil est
       en difficulté, ce qui ne dit rien de l'état de la chaîne MSSanté.`;
     $("bulletin").innerHTML = maillon("Alimentation et publication dans l'Annuaire Santé", "brouillard", "Aucune donnée.")
-      + maillon("Diffusion sur data.gouv.fr", "brouillard", "Aucune donnée.")
-      + maillon("Restitution sur les fiches", ...etatRestitution());
+      + maillon("Diffusion sur data.gouv.fr", "brouillard", "Aucune donnée.");
     return;
   }
 
@@ -377,8 +447,7 @@ async function demarrer() {
 
   $("bulletin").innerHTML =
     maillon("Alimentation et publication dans l'Annuaire Santé", ...etatAlimentation(dernier)) +
-    maillon("Diffusion sur data.gouv.fr", ...etatDiffusion(dernier)) +
-    maillon("Restitution sur les fiches", ...etatRestitution());
+    maillon("Diffusion sur data.gouv.fr", ...etatDiffusion(dernier));
 
   rendreChronologie(calendrier, agregats, aujourdhui);
 
@@ -400,6 +469,7 @@ async function demarrer() {
   rendreHistogramme(calendrier, agregats, aujourdhui);
   rendreDomaines(instantane, dernier);
   rendreJournal(calendrier);
+  rendreRetraits(agregats, aujourdhui);
 }
 
 /* Un onglet resté ouvert, ou restauré par le navigateur sans être réexécuté,

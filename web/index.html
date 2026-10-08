@@ -54,7 +54,6 @@
           <div class="fr-header__service">
             <a href="./" title="Publication des BAL MSSanté dans l'Annuaire Santé — suivi quotidien">
               <p class="fr-header__service-title">Publication des BAL MSSanté dans l'Annuaire Santé — suivi quotidien</p></a>
-            <p class="fr-header__service-tagline">Direction du numérique en santé · observation de la chaîne de publication</p>
           </div>
         </div>
       </div>
@@ -73,8 +72,7 @@
     <div class="meteo-grille" id="bulletin"></div>
     <p class="fr-text--xs fr-mt-1w note-lecture"><b>Lecture&nbsp;:</b> l'indicateur décrit
       l'état de la chaîne nationale et de ses maillons. Il ne s'applique jamais à un
-      domaine de messagerie pris isolément. Un maillon non instrumenté affiche son
-      indisponibilité, jamais un état favorable.</p>
+      domaine de messagerie pris isolément.</p>
   </section>
 
   <!-- 3. Chronologie -->
@@ -127,7 +125,21 @@
     <div id="journal"></div>
   </section>
 
-  <!-- 9. Méthode -->
+  <!-- 9. Retraits -->
+  <section class="fr-mb-4w" aria-labelledby="t-retraits">
+    <h2 id="t-retraits" class="fr-h5 fr-mb-1w">Adresses retirées de l'Annuaire Santé, par jour</h2>
+    <p class="fr-text--sm fr-mb-1w" id="retraits-synthese"></p>
+    <div id="retraits"></div>
+    <details class="fr-mt-1w"><summary class="fr-text--sm">Équivalent textuel des valeurs</summary>
+      <div id="retraits-texte" class="fr-text--xs"></div></details>
+    <p class="fr-text--xs fr-mt-1w note-lecture"><b>Lecture&nbsp;:</b> une adresse retirée
+      est une adresse présente dans l'extraction de la veille et absente de celle du jour.
+      Le dénombrement porte sur toutes les boîtes, personnelles et organisationnelles&nbsp;:
+      l'extraction ne permet pas d'isoler les suppressions de doublons. Une zone hachurée
+      signale une absence de données de l'outil, distincte d'un retrait nul mesuré.</p>
+  </section>
+
+  <!-- 10. Méthode -->
   <section class="fr-mb-4w" aria-labelledby="t-methode">
     <details class="repli" id="methode">
     <summary id="t-methode" class="repli__titre">Méthode, périmètre et RGPD</summary>
