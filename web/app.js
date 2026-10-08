@@ -402,4 +402,30 @@ async function demarrer() {
   rendreJournal(calendrier);
 }
 
-demarrer();
+/* Un onglet resté ouvert, ou restauré par le navigateur sans être réexécuté,
+   continue d'afficher les relevés du jour où il a été chargé : constaté le
+   2026-10-08, un visiteur a vu « Données périmées » au 4 octobre alors que le
+   site servait le 8. Au retour sur la page, les relevés sont donc rechargés
+   dès que le dernier chargement date de plus de quelques minutes. */
+const RECHARGEMENT_MINUTES = 5;
+let charge_le = 0, enCours = null;
+
+function charger() {
+  if (enCours) return enCours;
+  charge_le = Date.now();
+  enCours = demarrer().finally(() => { enCours = null; });
+  return enCours;
+}
+
+function rechargerSiAncien() {
+  if (Date.now() - charge_le > RECHARGEMENT_MINUTES * 60000) charger();
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") rechargerSiAncien();
+});
+// Page restaurée depuis le cache d'historique (retour arrière, onglet mobile) :
+// le script n'est pas réexécuté, seul cet événement le signale.
+window.addEventListener("pageshow", (e) => { if (e.persisted) rechargerSiAncien(); });
+
+charger();
