@@ -158,6 +158,38 @@ function rendreChronologie(calendrier, agregats, aujourdhui) {
     });
 }
 
+/* ---------- Échelle des histogrammes ---------- */
+
+/* Graduations « rondes » (1, 2 ou 5 × 10^n), quatre intervalles environ. Le
+   haut de l'échelle, et non la valeur maximale, fixe la hauteur des barres :
+   une barre se lit alors directement contre les graduations. */
+function echelle(max) {
+  const brut = Math.max(max, 1) / 4;
+  const puissance = 10 ** Math.floor(Math.log10(brut));
+  const pas = [1, 2, 5, 10].map((f) => f * puissance).find((v) => v >= brut);
+  const haut = Math.ceil(Math.max(max, 1) / pas) * pas;
+  const graduations = [];
+  for (let v = 0; v <= haut; v += pas) graduations.push(v);
+  return { haut, graduations };
+}
+
+function axe(cote, ech) {
+  return `<div class="axe axe--${cote}" aria-hidden="true">
+    <span class="axe-gabarit">${nf.format(ech.haut)}</span>` +
+    ech.graduations.map((v) =>
+      `<span class="axe-valeur" style="bottom:${(v / ech.haut) * 100}%">${nf.format(v)}</span>`).join("") +
+    `</div>`;
+}
+
+function grille(ech) {
+  return `<div class="grille" aria-hidden="true">` + ech.graduations.slice(1).map((v) =>
+    `<span style="bottom:${(v / ech.haut) * 100}%"></span>`).join("") + `</div>`;
+}
+
+function graphe(ech, contenu) {
+  return `<div class="graphe">${axe("g", ech)}${contenu}${axe("d", ech)}</div>`;
+}
+
 /* ---------- Histogramme ---------- */
 
 function rendreHistogramme(calendrier, agregats, aujourdhui) {
@@ -176,14 +208,14 @@ function rendreHistogramme(calendrier, agregats, aujourdhui) {
     $("histogramme-texte").innerHTML = "<p>Aucune valeur mesurée à ce jour.</p>";
     return;
   }
-  const max = Math.max(...connus);
-  $("histogramme").innerHTML = `<div class="histo">` + jours.map((j, i) => {
+  const ech = echelle(Math.max(...connus));
+  $("histogramme").innerHTML = graphe(ech, `<div class="histo">${grille(ech)}` + jours.map((j, i) => {
     const v = mesures[i];
     if (v === null) return `<div class="histo-barre manquante" title="${jourDe(j)} — données manquantes"></div>`;
     if (v === 0) return `<div class="histo-barre nulle" title="${jourDe(j)} — aucune publication"></div>`;
-    return `<div class="histo-barre" style="height:${Math.max(2, (v / max) * 100)}%"
+    return `<div class="histo-barre" style="height:${Math.max(1, (v / ech.haut) * 100)}%"
       title="${jourDe(j)} — ${nf.format(v)} adresses publiées"></div>`;
-  }).join("") + `</div>`;
+  }).join("") + `</div>`);
   $("histogramme-texte").innerHTML = "<ul>" + jours.map((j, i) =>
     `<li>${jourDe(j)} : ${mesures[i] === null ? "données manquantes" : nf.format(mesures[i])}</li>`
   ).join("") + "</ul>";
@@ -336,7 +368,7 @@ function rendreRetraits(agregats, aujourdhui) {
     return;
   }
 
-  const max = Math.max(...connus, 1);
+  const ech = echelle(Math.max(...connus));
   const colonnes = jours.map((j, i) => {
     const v = mesures[i];
     const d = new Date(j + "T12:00:00");
@@ -349,7 +381,7 @@ function rendreRetraits(agregats, aujourdhui) {
     let barre;
     if (v === null) barre = `<div class="histo-barre manquante"></div>`;
     else if (v === 0) barre = `<div class="histo-barre nulle"></div>`;
-    else barre = `<div class="histo-barre retrait" style="height:${Math.max(2, (v / max) * 100)}%"></div>`;
+    else barre = `<div class="histo-barre retrait" style="height:${Math.max(1, (v / ech.haut) * 100)}%"></div>`;
     const texte = v === null ? "données manquantes" : `${nf.format(v)} adresses retirées`;
     return `<div class="serie-col${repere ? " repere" : ""}"
       title="${jourDe(j)} — ${texte}${repere ? " · " + repere : ""}">
@@ -358,9 +390,9 @@ function rendreRetraits(agregats, aujourdhui) {
   }).join("");
 
   const reperes = Object.entries(REPERES).filter(([j]) => jours.includes(j));
-  $("retraits").innerHTML = `<div class="serie" role="img"
+  $("retraits").innerHTML = graphe(ech, `<div class="serie" role="img"
       aria-label="Adresses retirées par jour, du ${jourDe(jours[0])} au ${jourDe(jours[jours.length - 1])}">
-      ${colonnes}</div>` +
+      ${grille(ech)}${colonnes}</div>`) +
     (reperes.length ? `<p class="fr-text--xs fr-mt-1w fr-mb-0 legende-repere">` +
       reperes.map(([j, quoi]) => `<span class="marque-repere" aria-hidden="true"></span>${jourDe(j)}&nbsp;: ${quoi}`).join("<br>") +
       `</p>` : "");
@@ -409,9 +441,42 @@ function rendreTuiles(dernier, calendrier, instantane) {
           "horodatage de génération ANS");
 }
 
+/* ---------- Chargement ---------- */
+
+/* Un relevé par jour, soit plusieurs dizaines de fichiers : sans indication
+   de progression, « Chargement… » ne dit ni ce qui se passe ni combien de
+   temps cela prendra. */
+function indicateurChargement() {
+  const debut = performance.now();
+  let fait = 0, total = null;
+  $("fraicheur").innerHTML = `<span class="chargement" role="status">
+    <span class="chargement__roue" aria-hidden="true"></span>
+    <span id="chargement-texte">Chargement des relevés quotidiens…</span>
+    <span class="chargement__chrono" id="chargement-chrono" aria-hidden="true"></span></span>`;
+  const afficher = () => {
+    const t = $("chargement-texte"), c = $("chargement-chrono");
+    if (!t || !c) return;
+    t.textContent = total === null ? "Chargement de l'index des relevés…"
+      : `Chargement des relevés quotidiens : ${fait} sur ${total} jours`;
+    c.textContent = `${((performance.now() - debut) / 1000).toFixed(1).replace(".", ",")} s`;
+  };
+  const minuterie = setInterval(afficher, 100);
+  afficher();
+  return {
+    total(n) { total = n; afficher(); },
+    avance() { fait++; afficher(); },
+    fin() { clearInterval(minuterie); },
+  };
+}
+
 /* ---------- Assemblage ---------- */
 
 async function demarrer() {
+  const chargement = indicateurChargement();
+  try { await chargerEtRendre(chargement); } finally { chargement.fin(); }
+}
+
+async function chargerEtRendre(chargement) {
   let index, calendrier, instantane = null;
   try {
     [index, calendrier] = await Promise.all([json("data/index.json"), json("data/calendrier-publications.json")]);
@@ -423,9 +488,18 @@ async function demarrer() {
     return;
   }
 
+  // En parallèle : les relevés sont indépendants les uns des autres.
   const agregats = {};
-  for (const j of index.jours) { try { agregats[j] = await json(`data/daily/${j}.json`); } catch (e) {} }
-  if (index.instantane) { try { instantane = await json(`data/${index.instantane}`); } catch (e) {} }
+  chargement.total(index.jours.length);
+  await Promise.all([
+    ...index.jours.map(async (j) => {
+      try { agregats[j] = await json(`data/daily/${j}.json`); } catch (e) {}
+      chargement.avance();
+    }),
+    (async () => {
+      if (index.instantane) { try { instantane = await json(`data/${index.instantane}`); } catch (e) {} }
+    })(),
+  ]);
 
   const aujourdhui = index.jours.length ? index.jours[index.jours.length - 1] : calendrier.dernier_jour;
   const dernier = agregats[aujourdhui] || null;
