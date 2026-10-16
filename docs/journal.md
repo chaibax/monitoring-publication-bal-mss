@@ -181,6 +181,45 @@ piège que la tâche Supervision documentait déjà en toutes lettres — un `en
 défini sur un step n'est pas lisible dans le `if` de ce step. La condition
 était donc toujours fausse : l'alerte Slack n'aurait pas été émise même si la
 vigie avait vu la panne. Le webhook est remonté au niveau du job.
+## 16/10/2026 — Panne de l'outil, du 10 au 16 octobre
+
+### Décision 10 — Deux ancres de confiance, et une voie de repli
+
+**Ce qui s'est passé.** Le service d'extraction de l'ANS ne sert plus le
+fichier : depuis octobre 2026 il répond en **302 vers data.gouv.fr**. Notre
+contexte TLS n'ancrait que la racine IGC-Santé, nécessaire au premier saut
+et à lui seul ; le saut suivant, vers un hôte à autorité publique, échouait
+donc en vérification de certificat. La sonde a cessé de fonctionner le
+10 octobre et l'outil est resté aveugle six jours.
+
+La chaîne MSSanté, elle, a publié normalement pendant toute la période.
+
+**Ce qui a bien fonctionné.** La vigie a détecté la panne et a échoué chaque
+jour, comme prévu. Le dispositif a signalé sa propre défaillance ; c'est la
+remontée humaine qui a manqué, pas la détection.
+
+**Ce qui est corrigé.** Le contexte TLS porte désormais **deux ancres** : le
+magasin du système, pour les hôtes publics, et la racine IGC-Santé pour le
+premier saut. Épingler une autorité privée n'était pas l'erreur — l'erreur
+était de n'épingler qu'elle.
+
+La sonde et le téléchargement ont en outre une **voie de repli** vers le
+miroir, qui est la cible de la redirection de l'ANS. Le service de l'ANS
+limite le débit et répond 429 ; un refus passager ne doit pas interrompre
+la supervision. L'enregistrement note la voie empruntée.
+
+**Un format qui a changé au passage.** Le nom de fichier porte toujours
+l'horodatage de génération, mais le séparateur est devenu un tiret —
+`…-202610161108.zip` au lieu de `…_202608261013.zip` — et la réponse finale
+de data.gouv ne porte plus de nom dans `Content-Disposition` : l'horodatage
+ne subsiste que dans l'URL finale.
+
+**Ce que cet épisode dit de la décision 1.** Le choix du service de l'ANS
+comme source reposait sur son caractère amont. Cet amont n'existe plus : la
+distribution est passée à data.gouv, par décision de l'ANS lui-même. Router
+par l'URL de l'ANS garde son sens — elle restera valable si la distribution
+change encore — mais ce n'est plus une source indépendante du miroir, et le
+contrôle croisé entre les deux a perdu son objet. À reprendre.
 
 ---
 

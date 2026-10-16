@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import ssl
+import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
@@ -30,13 +31,25 @@ URL_EXTRACTION_ANS = (
     "/V300/services/extraction/Extraction_Correspondance_MSSante"
 )
 
-MOTIF_HORODATAGE = re.compile(r"_(\d{12})\.zip")
+# Le séparateur a changé avec la délégation à data.gouv en octobre 2026 :
+# `…_202608261013.zip` servi par l'ANS, `…-202610161108.zip` sur le miroir.
+MOTIF_HORODATAGE = re.compile(r"[-_](\d{12})\.zip")
 MOTIF_NOM = re.compile(r"filename=([^;\s]+)")
 
 
-def _contexte_igc_sante():
-    """Contexte TLS ancré sur IGC-Santé, sans toucher au magasin du système."""
-    return ssl.create_default_context(cafile=str(CA_IGC_SANTE))
+def contexte_ans():
+    """Contexte TLS pour le service d'extraction de l'ANS.
+
+    Deux ancres, et non une seule. Le magasin du système d'abord, parce que
+    depuis octobre 2026 le service répond en 302 vers data.gouv, dont le
+    certificat relève d'une autorité publique : n'ancrer que l'IGC-Santé
+    faisait échouer le saut, et c'est ce qui a mis l'outil à l'arrêt du
+    10 au 16 octobre 2026. La racine IGC-Santé ensuite, pour le premier
+    saut, que nulle autorité publique ne couvre.
+    """
+    contexte = ssl.create_default_context(cafile=os.environ.get("MONITORING_CA_BUNDLE"))
+    contexte.load_verify_locations(cafile=str(CA_IGC_SANTE))
+    return contexte
 
 
 def contexte_public():
@@ -73,6 +86,14 @@ URL_FHIR = "https://gateway.api.esante.gouv.fr/fhir/v2"
 DELAI = 300
 
 
+URL_ARCHIVE_DATAGOUV = (
+    "https://www.data.gouv.fr/api/1/datasets/"
+    "annuaire-sante-extraction-des-bal-mssante-format-zip/"
+)
+"""Depuis octobre 2026, le service de l'ANS redirige vers ce jeu de données :
+c'est le même fichier, au même horodatage, servi par la même redirection."""
+
+
 @dataclass
 class SondeANS:
     """Ce que la requête d'en-têtes apprend, sans transférer de contenu."""
@@ -80,27 +101,81 @@ class SondeANS:
     horodatage_generation: datetime
     taille_archive: int
     nom_fichier: str
+    via: str = "service.annuaire.sante.fr"
+    empreinte_sha1: str | None = None
+
+
+def metadonnees_archive_datagouv(url=URL_ARCHIVE_DATAGOUV):
+    """Métadonnées de l'archive sur le miroir : quelques kilo-octets.
+
+    Le nom de fichier y porte encore l'horodatage de génération par l'ANS,
+    et l'empreinte publiée permet de trancher la couche 1 sans télécharger.
+    """
+    with urllib.request.urlopen(url, timeout=DELAI, context=contexte_public()) as reponse:
+        ressource = json.load(reponse)["resources"][0]
+    extras = ressource.get("extras", {})
+    return {
+        "nom_fichier": ressource["url"].rsplit("/", 1)[-1],
+        "taille": extras.get("analysis:content-length") or ressource.get("filesize"),
+        "empreinte_sha1": extras.get("analysis:checksum"),
+    }
 
 
 def sonder_ans(url=URL_EXTRACTION_ANS):
     """Couche 0 : la source produit-elle, et depuis quand ?"""
     requete = urllib.request.Request(url, method="HEAD")
-    with urllib.request.urlopen(requete, timeout=DELAI, context=_contexte_igc_sante()) as reponse:
-        disposition = reponse.headers.get("Content-Disposition", "")
+    try:
+        with urllib.request.urlopen(requete, timeout=DELAI, context=contexte_ans()) as reponse:
+            disposition = reponse.headers.get("Content-Disposition", "")
+            # data.gouv répond `Content-Disposition: attachment`, sans nom :
+            # après redirection, l'horodatage ne subsiste que dans l'URL.
+            trouve = MOTIF_NOM.search(disposition)
+            nom = trouve.group(1) if trouve else reponse.url.rsplit("/", 1)[-1]
+            return SondeANS(
+                horodatage_generation=horodatage_depuis_nom_de_fichier(nom),
+                taille_archive=int(reponse.headers.get("Content-Length", 0)),
+                nom_fichier=nom,
+            )
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError):
+        # L'ANS limite le débit de son service et redirige de toute façon vers
+        # data.gouv : un refus passager ne doit pas interrompre la supervision.
+        # On note la voie empruntée plutôt que de faire comme si de rien n'était.
+        miroir = metadonnees_archive_datagouv()
         return SondeANS(
-            horodatage_generation=horodatage_depuis_nom_de_fichier(disposition),
-            taille_archive=int(reponse.headers.get("Content-Length", 0)),
-            nom_fichier=MOTIF_NOM.search(disposition).group(1),
+            horodatage_generation=horodatage_depuis_nom_de_fichier(miroir["nom_fichier"]),
+            taille_archive=int(miroir["taille"] or 0),
+            nom_fichier=miroir["nom_fichier"],
+            via="data.gouv.fr",
+            empreinte_sha1=miroir["empreinte_sha1"],
         )
 
 
+URL_TELECHARGEMENT_DATAGOUV = (
+    "https://www.data.gouv.fr/api/1/datasets/r/ad782114-db10-4ad7-a295-28426acbca1e"
+)
+"""Lien stable vers l'archive sur le miroir, vers lequel l'ANS redirige."""
+
+
 def telecharger_ans(destination, url=URL_EXTRACTION_ANS):
-    """Rapatrie l'archive. 20 Mo, environ deux secondes."""
-    requete = urllib.request.Request(url)
-    with urllib.request.urlopen(requete, timeout=DELAI, context=_contexte_igc_sante()) as reponse:
-        with open(destination, "wb") as fichier:
-            shutil.copyfileobj(reponse, fichier, length=1 << 20)
-    return Path(destination)
+    """Rapatrie l'archive. Une vingtaine de méga-octets, quelques secondes.
+
+    Si le service de l'ANS refuse — il limite le débit — le fichier est pris
+    sur le miroir, qui est la cible de sa propre redirection.
+    """
+    for adresse, contexte in (
+        (url, contexte_ans()),
+        (URL_TELECHARGEMENT_DATAGOUV, contexte_public()),
+    ):
+        try:
+            requete = urllib.request.Request(adresse)
+            with urllib.request.urlopen(requete, timeout=DELAI, context=contexte) as reponse:
+                with open(destination, "wb") as fichier:
+                    shutil.copyfileobj(reponse, fichier, length=1 << 20)
+            return Path(destination)
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
+            if adresse is URL_TELECHARGEMENT_DATAGOUV:
+                raise
+    raise RuntimeError("archive inaccessible par les deux voies")
 
 
 def lignes_de_l_archive(chemin):
