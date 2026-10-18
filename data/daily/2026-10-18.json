@@ -1,0 +1,208 @@
+{
+ "date": "2026-10-18",
+ "diffusion": {
+  "delai_secondes": 166,
+  "depose_le": "2026-10-18T08:42:46.267000+00:00",
+  "empreinte_miroir": "b2c00b3369789f5468673f6f0df7cb2ed71d87ef",
+  "genere_le": "2026-10-18T10:40:00",
+  "mesure": true
+ },
+ "domaines": {
+  "apfpaca.mssante.fr": [
+   50,
+   1,
+   0
+  ],
+  "aura.mssante.fr": [
+   63038,
+   1,
+   4
+  ],
+  "biogroup.mssante.fr": [
+   929,
+   0,
+   2
+  ],
+  "cgm.mssante.fr": [
+   13143,
+   0,
+   1
+  ],
+  "ch-cholet.mssante.fr": [
+   596,
+   1,
+   0
+  ],
+  "ch-cotentin.mssante.fr": [
+   2597,
+   0,
+   3
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   5068,
+   11,
+   10
+  ],
+  "chorus.mssante.fr": [
+   1224,
+   2,
+   0
+  ],
+  "chu-angers.mssante.fr": [
+   2091,
+   0,
+   1
+  ],
+  "chu-rouen.mssante.fr": [
+   1536,
+   1,
+   1
+  ],
+  "chu-toulouse.mssante.fr": [
+   8297,
+   5,
+   1
+  ],
+  "ehpadvalberes.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "esantepdl.mssante.fr": [
+   2212,
+   3,
+   5
+  ],
+  "famille-services.mssante.fr": [
+   0,
+   0,
+   1
+  ],
+  "fildargent.mssante.fr": [
+   1,
+   1,
+   0
+  ],
+  "fondationalia.aura.mssante.fr": [
+   65,
+   1,
+   0
+  ],
+  "icm46.mssante.fr": [
+   74,
+   0,
+   1
+  ],
+  "infirmier.mssante.fr": [
+   16811,
+   64,
+   60
+  ],
+  "inicea.mssante.fr": [
+   1268,
+   1,
+   0
+  ],
+  "institut-universitaire-cancer.mssante.fr": [
+   593,
+   0,
+   1
+  ],
+  "interop-mssante.apicrypt.org": [
+   23913,
+   1,
+   1
+  ],
+  "ipc-unicancer.mssante.fr": [
+   289,
+   1,
+   0
+  ],
+  "lgpi.mssante.fr": [
+   3902,
+   0,
+   1
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8506,
+   31,
+   49
+  ],
+  "medecin.mssante.fr": [
+   64087,
+   48,
+   40
+  ],
+  "medecin.oc.mssante.fr": [
+   4826,
+   0,
+   1
+  ],
+  "orthophoniste.mssante.fr": [
+   9407,
+   13,
+   23
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1264,
+   4,
+   8
+  ],
+  "pharmacie-paca.mssante.fr": [
+   1498,
+   0,
+   1
+  ],
+  "pharmacien.mssante.fr": [
+   7535,
+   20,
+   11
+  ],
+  "pharmacien.oc.mssante.fr": [
+   2070,
+   0,
+   1
+  ],
+  "pro.mssante.fr": [
+   25721,
+   58,
+   76
+  ],
+  "reseauapef.mssante.fr": [
+   47,
+   0,
+   1
+  ],
+  "sage-femme.mssante.fr": [
+   5810,
+   3,
+   6
+  ],
+  "service-a-dom.mssante.fr": [
+   12,
+   0,
+   2
+  ],
+  "varcde.mssante.fr": [
+   25,
+   25,
+   0
+  ]
+ },
+ "fetched_at": "2026-10-18T14:30:58+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 558993,
+ "modifications": null,
+ "national": {
+  "creations": 297,
+  "suppressions": 312,
+  "total_bal": 558817
+ },
+ "par_type": {
+  "ORG": 92302,
+  "PER": 466515
+ },
+ "source_fingerprint": "cfa4f1df040becf3b9bb90bab3120e729334c1a365ab060e42d470996d607532",
+ "source_timestamp": "2026-10-18T10:40:00",
+ "statut": "nominal"
+}
