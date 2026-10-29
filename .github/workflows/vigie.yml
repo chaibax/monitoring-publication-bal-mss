@@ -98,3 +98,31 @@ jobs:
               f"Détail : https://github.com/{depot}/actions/runs/{execution}"}))
           PY
           )" "$SLACK_WEBHOOK"
+
+  # La mémoire de l'outil (empreintes salées du dernier relevé) vit dans le
+  # cache GitHub, qui évince toute entrée non consultée pendant sept jours. Du
+  # 10 au 16 octobre 2026, la collecte en panne ne l'a plus relue : elle a été
+  # évincée, et les retraits de la semaine sont restés inconnus. La relire
+  # chaque jour, dans une tâche indépendante de la collecte, la garde en vie
+  # quelle que soit la durée d'une panne : le relevé suivant compare alors au
+  # dernier relevé réussi et ne perd aucun mouvement. Voir la décision 11.
+  memoire:
+    name: Entretien de la mémoire de l'outil
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Relire le dernier état de référence
+        id: etat
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache
+          key: etat-entretien-${{ github.run_id }}   # jamais créée : seule la clé de repli sert
+          restore-keys: etat-
+
+      - name: Vérifier qu'un état existe
+        run: |
+          if [ -z "${{ steps.etat.outputs.cache-matched-key }}" ] || [ ! -s .cache/etat.bin ]; then
+            echo "::error::Aucun état de référence dans le cache : le prochain relevé sera indéterminé, et les mouvements depuis le dernier relevé réussi seront perdus."
+            exit 1
+          fi
+          echo "État relu : ${{ steps.etat.outputs.cache-matched-key }} ($(du -h .cache/etat.bin | cut -f1))."

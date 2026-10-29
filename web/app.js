@@ -371,8 +371,22 @@ function chaineDesRetraits(agregats) {
     }
     precedent = j;
   }
+  // Une période non mesurée est estimée au rythme mesuré dans les quatorze
+  // jours qui l'entourent, arrondi à la centaine : c'est un ordre de grandeur,
+  // affiché comme tel et jamais confondu avec la mesure.
+  for (const l of lacunes) {
+    const autour = intervalles.filter((iv) =>
+      (iv.fin <= l.debut && ecartJours(iv.fin, l.debut) < FENETRE_ESTIMATION) ||
+      (iv.debut >= l.fin && ecartJours(l.fin, iv.debut) < FENETRE_ESTIMATION));
+    const rythme = bilanRetraits(autour).parJour;
+    l.jours = ecartJours(l.debut, l.fin);
+    l.rythme = rythme;
+    l.estimation = rythme === null ? null : Math.round((rythme * l.jours) / 100) * 100;
+  }
   return { intervalles, lacunes };
 }
+
+const FENETRE_ESTIMATION = 14;
 
 function bilanRetraits(intervalles) {
   const retraits = intervalles.reduce((s, x) => s + x.retraits, 0);
@@ -393,13 +407,19 @@ function rendreRetraits(agregats, aujourdhui) {
   const etendue = Math.max(1, ecartJours(premier, aujourdhui));
   const x = (j) => (ecartJours(premier, j) / etendue) * 100;
 
-  // Cumul : la courbe ne reprend qu'au-delà d'une lacune, sans rien y ajouter.
+  // Cumul. Au-delà d'une lacune, la courbe reprend augmentée de l'estimation,
+  // tracée en pointillés à travers la zone hachurée.
   let cumul = 0;
-  const troncons = [];
+  const troncons = [], estimees = [];
   let troncon = null;
   const points = [];
   for (const iv of intervalles) {
     if (!troncon || troncon.fin !== iv.debut) {
+      const l = troncon && lacunes.find((x) => x.debut === troncon.fin && x.fin === iv.debut);
+      if (l && l.estimation !== null) {
+        estimees.push([{ j: l.debut, cumul }, { j: l.fin, cumul: cumul + l.estimation }]);
+        cumul += l.estimation;
+      }
       troncon = { fin: iv.debut, points: [{ j: iv.debut, cumul }] };
       troncons.push(troncon);
     }
@@ -412,10 +432,13 @@ function rendreRetraits(agregats, aujourdhui) {
   const y = (v) => 100 - (v / ech.haut) * 100;
 
   const traces = troncons.map((t) => `<polyline points="${t.points.map((p) =>
-    `${x(p.j).toFixed(3)},${y(p.cumul).toFixed(3)}`).join(" ")}" />`).join("");
+    `${x(p.j).toFixed(3)},${y(p.cumul).toFixed(3)}`).join(" ")}" />`).join("") +
+    estimees.map((e) => `<polyline class="estimee" points="${e.map((p) =>
+      `${x(p.j).toFixed(3)},${y(p.cumul).toFixed(3)}`).join(" ")}" />`).join("");
   const zonesLacunes = lacunes.map((l) => `<div class="courbe-lacune"
     style="left:${x(l.debut)}%;width:${x(l.fin) - x(l.debut)}%"
-    title="Du ${jourDe(l.debut)} au ${jourDe(l.fin)} — retraits non mesurés, non comptés"></div>`).join("");
+    title="Du ${jourDe(l.debut)} au ${jourDe(l.fin)} — retraits non mesurés${l.estimation === null
+      ? ", non comptés" : `, estimés à environ ${nf.format(l.estimation)}`}"></div>`).join("");
   const reperes = Object.entries(REPERES).filter(([j]) => j >= premier && j <= aujourdhui);
   const lignesReperes = reperes.map(([j, quoi]) => `<div class="courbe-repere" style="left:${x(j)}%"
     title="${jourDe(j)} — ${quoi}"></div>`).join("");
@@ -447,28 +470,46 @@ function rendreRetraits(agregats, aujourdhui) {
     ${axe("d", ech)}</div>
     <p class="fr-text--xs fr-mt-1w fr-mb-0 legende-repere">
       ${reperes.map(([j, quoi]) => `<span class="marque-repere" aria-hidden="true"></span>${jourDe(j)}&nbsp;: ${quoi}`).join("<br>")}
-      ${lacunes.length ? `<br><span class="marque-lacune" aria-hidden="true"></span>retraits non mesurés,
-        donc non comptés&nbsp;: ${lacunes.map((l) => `du ${jourDe(l.debut)} au ${jourDe(l.fin)}`).join(", ")}` : ""}</p>`;
+      ${lacunes.map((l) => `<br><span class="marque-lacune" aria-hidden="true"></span>du
+        ${jourDe(l.debut)} au ${jourDe(l.fin)}, retraits non mesurés${l.estimation === null
+        ? ", non comptés" : `&nbsp;: <span class="marque-estimee" aria-hidden="true"></span>estimés
+        à environ <b>${nf.format(l.estimation)}</b>, au rythme mesuré dans les ${FENETRE_ESTIMATION}
+        jours qui entourent la période (${nf.format(l.rythme)} par jour)`}`).join("")}</p>`;
 
-  $("retraits-texte").innerHTML = "<ul>" + points.map((p) => `<li>${jourDe(p.fin)} : ${nf.format(p.retraits)}
+  const lignesTexte = points.map((p) => [p.fin, `<li>${jourDe(p.fin)} : ${nf.format(p.retraits)}
     retraits${ecartJours(p.debut, p.fin) > 1 ? ` (depuis le relevé du ${jourDe(p.debut)})` : ""},
-    ${nf.format(p.cumul)} cumulés</li>`).join("") + "</ul>";
+    ${nf.format(p.cumul)} cumulés</li>`]).concat(lacunes.map((l) => [l.fin, `<li>Du ${jourDe(l.debut)}
+    au ${jourDe(l.fin)} : non mesuré${l.estimation === null ? "" : `, estimé à environ ${nf.format(l.estimation)}`}</li>`]));
+  $("retraits-texte").innerHTML = "<ul>" + lignesTexte.sort((a, b) => a[0].localeCompare(b[0]) || (a[1].startsWith("<li>Du") ? -1 : 1))
+    .map(([, li]) => li).join("") + "</ul>";
 
   // Bilan avant / depuis le premier repère. La moyenne divise par les jours
   // couverts, pas par le nombre de relevés : un relevé peut en couvrir deux.
   const [repere] = reperes.map(([j]) => j);
   if (!repere) { $("retraits-synthese").innerHTML = ""; return; }
-  const avant = bilanRetraits(intervalles.filter((iv) => iv.fin <= repere));
-  const apres = bilanRetraits(intervalles.filter((iv) => iv.fin > repere));
-  const ligne = (periode, b) => `<tr><td>${periode}</td>
-    <td class="nombre">${nf.format(b.retraits)}</td><td class="nombre">${b.jours} j</td>
-    <td class="nombre">${b.parJour === null ? "—" : nf.format(b.parJour)}</td></tr>`;
+  const ligne = (periode, b, approx = "", classe = "") => `<tr${classe ? ` class="${classe}"` : ""}><td>${periode}</td>
+    <td class="nombre">${approx}${nf.format(b.retraits)}</td><td class="nombre">${b.jours} j</td>
+    <td class="nombre">${b.parJour === null ? "—" : approx + nf.format(b.parJour)}</td></tr>`;
+  // Une période : la mesure seule, puis, s'il y a des lacunes estimées, chacune
+  // sur sa ligne et le total qui les inclut.
+  const periode = (libelle, garder) => {
+    const mesure = bilanRetraits(intervalles.filter((iv) => garder(iv.fin)));
+    const estimees = lacunes.filter((l) => garder(l.fin) && l.estimation !== null);
+    if (!estimees.length) return ligne(libelle, mesure);
+    const retraits = mesure.retraits + estimees.reduce((s, l) => s + l.estimation, 0);
+    const jours = mesure.jours + estimees.reduce((s, l) => s + l.jours, 0);
+    return ligne(`${libelle}, mesurés`, mesure) +
+      estimees.map((l) => ligne(`Estimation du ${jourDe(l.debut)} au ${jourDe(l.fin)} (non mesuré)`,
+        { retraits: l.estimation, jours: l.jours, parJour: l.rythme }, "≈ ", "estimation")).join("") +
+      ligne(`${libelle}, estimation comprise`,
+        { retraits: Math.round(retraits / 100) * 100, jours, parJour: Math.round(retraits / jours) }, "≈ ", "total");
+  };
   $("retraits-synthese").innerHTML = `<div class="enveloppe-defilante"><table class="tableau-domaines">
     <caption class="fr-sr-only">Retraits avant et depuis le ${jourDe(repere)}</caption>
     <thead><tr><th scope="col">Période</th><th scope="col" class="nombre">Retraits</th>
-      <th scope="col" class="nombre">Jours mesurés</th><th scope="col" class="nombre">Par jour</th></tr></thead>
-    <tbody>${ligne(`Du ${jourDe(premier)} au ${jourDe(repere)}`, avant)}
-      ${ligne(`Du ${jourDe(repere)} au ${jourDe(aujourdhui)}`, apres)}</tbody></table></div>`;
+      <th scope="col" class="nombre">Jours</th><th scope="col" class="nombre">Par jour</th></tr></thead>
+    <tbody>${periode(`Du ${jourDe(premier)} au ${jourDe(repere)}`, (j) => j <= repere)}
+      ${periode(`Du ${jourDe(repere)} au ${jourDe(aujourdhui)}`, (j) => j > repere)}</tbody></table></div>`;
 }
 
 /* ---------- Tuiles ---------- */
