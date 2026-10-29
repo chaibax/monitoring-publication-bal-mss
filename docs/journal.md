@@ -221,6 +221,30 @@ par l'URL de l'ANS garde son sens — elle restera valable si la distribution
 change encore — mais ce n'est plus une source indépendante du miroir, et le
 contrôle croisé entre les deux a perdu son objet. À reprendre.
 
+## 29/10/2026 — Le trou dans la série des retraits
+
+### Décision 11 — La mémoire de l'outil est relue chaque jour
+
+**Ce que la panne a coûté.** Chaque relevé compare l'extraction du jour à
+l'état du dernier relevé réussi, quel que soit l'écart : un jour sans relevé
+ne fait perdre aucun mouvement, ils sont comptés au relevé suivant. Cet état
+vit dans le cache GitHub, qui évince toute entrée non consultée pendant sept
+jours. La panne du 10 au 16 octobre a duré juste assez : l'état du 9 a été
+évincé, le relevé du 16 est sorti indéterminé, et les retraits de la semaine
+sont perdus. Ils ne sont pas récupérables : data.gouv ne conserve que la
+version courante du fichier, et l'Internet Archive n'en a capturé aucune sur
+la période.
+
+**Ce qui est corrigé.** La vigie, qui tourne chaque jour indépendamment de la
+collecte, relit désormais l'état de référence. Une relecture compte comme
+une consultation : l'état ne peut plus être évincé tant que la vigie tourne,
+et une panne de la collecte, quelle que soit sa durée, ne coûte plus que du
+retard. La vigie échoue si aucun état n'existe.
+
+**Ce que la page en dit.** La période perdue reste hachurée. Ses retraits y
+sont estimés au rythme mesuré autour d'elle et tracés en pointillés,
+distincts de la mesure, et la synthèse les présente sur une ligne à part.
+
 ---
 
 ## Surprises sur les données

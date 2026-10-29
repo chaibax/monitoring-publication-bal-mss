@@ -101,6 +101,7 @@
 .courbe svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 2; }
 .courbe polyline { fill: none; stroke: var(--background-action-high-purple-glycine, #6e445a);
   stroke-width: 2.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.courbe polyline.estimee { stroke-dasharray: 5 4; stroke-width: 2; }
 .courbe-point { position: absolute; width: 7px; height: 7px; margin: 0 0 -3.5px -3.5px; border-radius: 50%;
   background: var(--background-action-high-purple-glycine, #6e445a); z-index: 3; }
 .courbe-lacune { position: absolute; top: 0; bottom: 0;
@@ -114,6 +115,11 @@
 .courbe-dates span:first-child { transform: none; }
 .courbe-dates span:last-child { transform: translateX(-100%); }
 @media (max-width: 36em) { .courbe-dates span.secondaire { display: none; } }
+.marque-estimee { display: inline-block; width: 1.2rem; margin: 0 .3rem; vertical-align: .2rem;
+  border-top: 2px dashed var(--background-action-high-purple-glycine, #6e445a); }
+#retraits-synthese .nombre { white-space: nowrap; }
+.tableau-domaines tr.estimation td { font-style: italic; color: var(--text-mention-grey); }
+.tableau-domaines tr.total td { font-weight: 700; }
 .marque-lacune { display: inline-block; width: .8rem; height: .8rem; margin-right: .4rem;
   vertical-align: -.1rem; background-image: repeating-linear-gradient(45deg,
     transparent, transparent 2px, var(--border-default-grey) 2px, var(--border-default-grey) 3px); }
