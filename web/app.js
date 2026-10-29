@@ -349,73 +349,126 @@ const REPERES = {
   "2026-09-23": "e-mailing aux médecins ayant une BAL en double",
 };
 
-function moyenne(valeurs) {
-  return valeurs.length ? Math.round(valeurs.reduce((s, v) => s + v, 0) / valeurs.length) : null;
+const UN_JOUR = 86400000;
+const ecartJours = (a, b) => Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / UN_JOUR);
+
+/* Chaque relevé compare l'extraction du jour à celle du relevé précédent,
+   quel que soit l'écart entre les deux : un jour sans relevé ne perd aucun
+   retrait, ils sont comptés au relevé suivant, qui couvre alors plusieurs
+   jours. Seule une journée indéterminée rompt la chaîne : les retraits
+   survenus depuis le relevé précédent sont alors inconnus. */
+function chaineDesRetraits(agregats) {
+  const intervalles = [], lacunes = [];
+  let precedent = null;
+  for (const j of Object.keys(agregats).sort()) {
+    const a = agregats[j];
+    const mesure = a.statut === "nominal" && a.national.suppressions !== null
+      && a.national.suppressions !== undefined;
+    if (precedent && mesure) {
+      intervalles.push({ debut: precedent, fin: j, retraits: a.national.suppressions });
+    } else if (precedent) {
+      lacunes.push({ debut: precedent, fin: j });
+    }
+    precedent = j;
+  }
+  return { intervalles, lacunes };
+}
+
+function bilanRetraits(intervalles) {
+  const retraits = intervalles.reduce((s, x) => s + x.retraits, 0);
+  const jours = intervalles.reduce((s, x) => s + ecartJours(x.debut, x.fin), 0);
+  return { retraits, jours, parJour: jours ? Math.round(retraits / jours) : null };
 }
 
 function rendreRetraits(agregats, aujourdhui) {
-  const jours = derniersJours(JOURS_CHRONO, aujourdhui);
-  const valeurDe = (j) => (agregats[j] && agregats[j].national.suppressions !== null
-    && agregats[j].national.suppressions !== undefined) ? agregats[j].national.suppressions : null;
-  const mesures = jours.map(valeurDe);
-  const connus = mesures.filter((v) => v !== null);
-
-  if (!connus.length) {
+  const { intervalles, lacunes } = chaineDesRetraits(agregats);
+  if (!intervalles.length) {
     $("retraits").innerHTML = `<div class="histo-vide"><p class="fr-mb-0">Aucun retrait mesuré
-      sur la période.</p></div>`;
-    $("retraits-texte").innerHTML = "";
-    $("retraits-synthese").innerHTML = "";
+      à ce jour.</p></div>`;
+    $("retraits-texte").innerHTML = $("retraits-synthese").innerHTML = "";
     return;
   }
 
-  const ech = echelle(Math.max(...connus));
-  const colonnes = jours.map((j, i) => {
-    const v = mesures[i];
+  const premier = Object.keys(agregats).sort()[0];
+  const etendue = Math.max(1, ecartJours(premier, aujourdhui));
+  const x = (j) => (ecartJours(premier, j) / etendue) * 100;
+
+  // Cumul : la courbe ne reprend qu'au-delà d'une lacune, sans rien y ajouter.
+  let cumul = 0;
+  const troncons = [];
+  let troncon = null;
+  const points = [];
+  for (const iv of intervalles) {
+    if (!troncon || troncon.fin !== iv.debut) {
+      troncon = { fin: iv.debut, points: [{ j: iv.debut, cumul }] };
+      troncons.push(troncon);
+    }
+    cumul += iv.retraits;
+    troncon.points.push({ j: iv.fin, cumul });
+    troncon.fin = iv.fin;
+    points.push({ ...iv, cumul });
+  }
+  const ech = echelle(cumul);
+  const y = (v) => 100 - (v / ech.haut) * 100;
+
+  const traces = troncons.map((t) => `<polyline points="${t.points.map((p) =>
+    `${x(p.j).toFixed(3)},${y(p.cumul).toFixed(3)}`).join(" ")}" />`).join("");
+  const zonesLacunes = lacunes.map((l) => `<div class="courbe-lacune"
+    style="left:${x(l.debut)}%;width:${x(l.fin) - x(l.debut)}%"
+    title="Du ${jourDe(l.debut)} au ${jourDe(l.fin)} — retraits non mesurés, non comptés"></div>`).join("");
+  const reperes = Object.entries(REPERES).filter(([j]) => j >= premier && j <= aujourdhui);
+  const lignesReperes = reperes.map(([j, quoi]) => `<div class="courbe-repere" style="left:${x(j)}%"
+    title="${jourDe(j)} — ${quoi}"></div>`).join("");
+  const marques = points.map((p) => `<span class="courbe-point"
+    style="left:${x(p.fin)}%;bottom:${100 - y(p.cumul)}%"
+    title="${jourDe(p.fin)} — ${nf.format(p.cumul)} retraits cumulés (+${nf.format(p.retraits)}${
+      ecartJours(p.debut, p.fin) > 1 ? ` sur ${ecartJours(p.debut, p.fin)} jours` : ""})"></span>`).join("");
+
+  // Dates sous la courbe : premier jour, débuts de mois, repères, dernier jour.
+  const dates = new Set([premier, aujourdhui, ...reperes.map(([j]) => j)]);
+  for (let d = new Date(premier + "T12:00:00"); d <= new Date(aujourdhui + "T12:00:00"); d.setDate(d.getDate() + 1)) {
+    if (d.getDate() === 1) dates.add(d.toISOString().slice(0, 10));
+  }
+  // Sur petit écran, un début de mois trop proche d'une date prioritaire
+  // (premier jour, repère, dernier jour) s'efface plutôt que de la chevaucher.
+  const prioritaires = [premier, aujourdhui, ...reperes.map(([j]) => j)];
+  const etiquettes = [...dates].sort().map((j) => {
     const d = new Date(j + "T12:00:00");
-    const etiquette = d.getDate() === 1
-      ? `1<span class="chrono-mois">${MOIS_COURT.format(d).replace(".", "")}</span>` : d.getDate();
-    const repere = REPERES[j];
-    // Sur petit écran, trente numéros se chevauchent : seuls restent le
-    // premier du mois, les multiples de cinq et les jours repérés.
-    const secondaire = !repere && d.getDate() !== 1 && d.getDate() % 5 !== 0;
-    let barre;
-    if (v === null) barre = `<div class="histo-barre manquante"></div>`;
-    else if (v === 0) barre = `<div class="histo-barre nulle"></div>`;
-    else barre = `<div class="histo-barre retrait" style="height:${Math.max(1, (v / ech.haut) * 100)}%"></div>`;
-    const texte = v === null ? "données manquantes" : `${nf.format(v)} adresses retirées`;
-    return `<div class="serie-col${repere ? " repere" : ""}"
-      title="${jourDe(j)} — ${texte}${repere ? " · " + repere : ""}">
-      <div class="serie-zone">${barre}</div>
-      <span class="chrono-etiquette${secondaire ? " secondaire" : ""}" aria-hidden="true">${etiquette}</span></div>`;
+    const secondaire = !prioritaires.includes(j) && prioritaires.some((k) => Math.abs(x(k) - x(j)) < 16);
+    return `<span${secondaire ? ' class="secondaire"' : ""} style="left:${x(j)}%">${d.getDate()} ${MOIS_COURT.format(d).replace(".", "")}</span>`;
   }).join("");
 
-  const reperes = Object.entries(REPERES).filter(([j]) => jours.includes(j));
-  $("retraits").innerHTML = graphe(ech, `<div class="serie" role="img"
-      aria-label="Adresses retirées par jour, du ${jourDe(jours[0])} au ${jourDe(jours[jours.length - 1])}">
-      ${grille(ech)}${colonnes}</div>`) +
-    (reperes.length ? `<p class="fr-text--xs fr-mt-1w fr-mb-0 legende-repere">` +
-      reperes.map(([j, quoi]) => `<span class="marque-repere" aria-hidden="true"></span>${jourDe(j)}&nbsp;: ${quoi}`).join("<br>") +
-      `</p>` : "");
+  $("retraits").innerHTML = `<div class="graphe" style="--hauteur:14rem">${axe("g", ech)}
+    <div><div class="courbe" role="img" aria-label="Retraits cumulés depuis le ${jourDe(premier)} : ${nf.format(cumul)} au ${jourDe(aujourdhui)}">
+      ${grille(ech)}${zonesLacunes}${lignesReperes}
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${traces}</svg>
+      ${marques}</div>
+    <div class="courbe-dates" aria-hidden="true">${etiquettes}</div></div>
+    ${axe("d", ech)}</div>
+    <p class="fr-text--xs fr-mt-1w fr-mb-0 legende-repere">
+      ${reperes.map(([j, quoi]) => `<span class="marque-repere" aria-hidden="true"></span>${jourDe(j)}&nbsp;: ${quoi}`).join("<br>")}
+      ${lacunes.length ? `<br><span class="marque-lacune" aria-hidden="true"></span>retraits non mesurés,
+        donc non comptés&nbsp;: ${lacunes.map((l) => `du ${jourDe(l.debut)} au ${jourDe(l.fin)}`).join(", ")}` : ""}</p>`;
 
-  $("retraits-texte").innerHTML = "<ul>" + jours.map((j, i) =>
-    `<li>${jourDe(j)} : ${mesures[i] === null ? "données manquantes" : nf.format(mesures[i])}${REPERES[j] ? " — " + REPERES[j] : ""}</li>`
-  ).join("") + "</ul>";
+  $("retraits-texte").innerHTML = "<ul>" + points.map((p) => `<li>${jourDe(p.fin)} : ${nf.format(p.retraits)}
+    retraits${ecartJours(p.debut, p.fin) > 1 ? ` (depuis le relevé du ${jourDe(p.debut)})` : ""},
+    ${nf.format(p.cumul)} cumulés</li>`).join("") + "</ul>";
 
-  // Comparaison avant / depuis le premier repère, sur des durées égales :
-  // la moyenne ne porte que sur les jours effectivement mesurés.
-  const [premier] = Object.keys(REPERES).sort();
-  if (!premier || premier > aujourdhui) { $("retraits-synthese").innerHTML = ""; return; }
-  const apres = Object.keys(agregats).filter((j) => j >= premier && j <= aujourdhui).sort();
-  const n = apres.length;
-  const avant = Object.keys(agregats).filter((j) => j < premier).sort().slice(-n);
-  const valeurs = (liste) => liste.map(valeurDe).filter((v) => v !== null);
-  const mAvant = moyenne(valeurs(avant)), mApres = moyenne(valeurs(apres));
-  const total = valeurs(apres).reduce((s, v) => s + v, 0);
-  $("retraits-synthese").innerHTML = (mAvant === null || mApres === null) ? "" :
-    `Depuis le ${jourDe(premier)}&nbsp;: <b>${nf.format(total)}</b> adresses retirées en
-     ${valeurs(apres).length} jours mesurés, soit <b>${nf.format(mApres)}</b> par jour en moyenne,
-     contre <b>${nf.format(mAvant)}</b> par jour sur les ${valeurs(avant).length} jours mesurés
-     qui précèdent.`;
+  // Bilan avant / depuis le premier repère. La moyenne divise par les jours
+  // couverts, pas par le nombre de relevés : un relevé peut en couvrir deux.
+  const [repere] = reperes.map(([j]) => j);
+  if (!repere) { $("retraits-synthese").innerHTML = ""; return; }
+  const avant = bilanRetraits(intervalles.filter((iv) => iv.fin <= repere));
+  const apres = bilanRetraits(intervalles.filter((iv) => iv.fin > repere));
+  const ligne = (periode, b) => `<tr><td>${periode}</td>
+    <td class="nombre">${nf.format(b.retraits)}</td><td class="nombre">${b.jours} j</td>
+    <td class="nombre">${b.parJour === null ? "—" : nf.format(b.parJour)}</td></tr>`;
+  $("retraits-synthese").innerHTML = `<div class="enveloppe-defilante"><table class="tableau-domaines">
+    <caption class="fr-sr-only">Retraits avant et depuis le ${jourDe(repere)}</caption>
+    <thead><tr><th scope="col">Période</th><th scope="col" class="nombre">Retraits</th>
+      <th scope="col" class="nombre">Jours mesurés</th><th scope="col" class="nombre">Par jour</th></tr></thead>
+    <tbody>${ligne(`Du ${jourDe(premier)} au ${jourDe(repere)}`, avant)}
+      ${ligne(`Du ${jourDe(repere)} au ${jourDe(aujourdhui)}`, apres)}</tbody></table></div>`;
 }
 
 /* ---------- Tuiles ---------- */

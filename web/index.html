@@ -127,16 +127,20 @@
 
   <!-- 9. Retraits -->
   <section class="fr-mb-4w" aria-labelledby="t-retraits">
-    <h2 id="t-retraits" class="fr-h5 fr-mb-1w">Adresses retirées de l'Annuaire Santé, par jour</h2>
-    <p class="fr-text--sm fr-mb-1w" id="retraits-synthese"></p>
+    <h2 id="t-retraits" class="fr-h5 fr-mb-1w">Adresses retirées de l'Annuaire Santé, en cumul</h2>
+    <div id="retraits-synthese" class="fr-mb-2w"></div>
     <div id="retraits"></div>
     <details class="fr-mt-1w"><summary class="fr-text--sm">Équivalent textuel des valeurs</summary>
       <div id="retraits-texte" class="fr-text--xs"></div></details>
-    <p class="fr-text--xs fr-mt-1w note-lecture"><b>Lecture&nbsp;:</b> une adresse retirée
-      est une adresse présente dans l'extraction de la veille et absente de celle du jour.
-      Le dénombrement porte sur toutes les boîtes, personnelles et organisationnelles&nbsp;:
-      l'extraction ne permet pas d'isoler les suppressions de doublons. Une zone hachurée
-      signale une absence de données de l'outil, distincte d'un retrait nul mesuré.</p>
+    <p class="fr-text--xs fr-mt-1w note-lecture"><b>Lecture&nbsp;:</b> la courbe additionne
+      les adresses retirées depuis le début de l'observation&nbsp;; plus elle est raide, plus
+      les retraits sont nombreux. Un retrait est une adresse présente dans l'extraction
+      précédente et absente de celle du jour. Un jour sans relevé ne fait perdre aucun
+      retrait&nbsp;: ils sont comptés au relevé suivant, qui couvre alors plusieurs jours.
+      Une zone hachurée est une période où la comparaison a été impossible&nbsp;: ses
+      retraits sont inconnus et ne sont pas comptés. Le dénombrement porte sur toutes les
+      boîtes, personnelles et organisationnelles&nbsp;: l'extraction ne permet pas d'isoler
+      les suppressions de doublons.</p>
   </section>
 
   <!-- 10. Méthode -->
