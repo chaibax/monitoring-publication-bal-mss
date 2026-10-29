@@ -95,31 +95,42 @@
     transparent, transparent 3px,
     var(--border-default-grey) 3px, var(--border-default-grey) 4px);
 }
-/* --- Retraits : une colonne par jour, l'étiquette sous la barre --- */
-.serie { position: relative; display: flex; gap: 2px; }
-.serie-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; }
-.serie-zone { width: 100%; height: 11rem; display: flex; align-items: flex-end;
+/* --- Retraits : courbe du cumul --- */
+.courbe { position: relative; height: var(--hauteur, 11rem);
   border-bottom: 1px solid var(--border-plain-grey); }
-.serie-zone .histo-barre { width: 100%; }
-.histo-barre.retrait { background: var(--background-action-high-purple-glycine, #6e445a); }
-.serie-col.repere .serie-zone { box-shadow: inset 0 3px 0 var(--border-plain-grey);
-  background: var(--background-contrast-grey); }
-@media (max-width: 36em) { .serie .chrono-etiquette.secondaire { visibility: hidden; } }
+.courbe svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 2; }
+.courbe polyline { fill: none; stroke: var(--background-action-high-purple-glycine, #6e445a);
+  stroke-width: 2.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.courbe-point { position: absolute; width: 7px; height: 7px; margin: 0 0 -3.5px -3.5px; border-radius: 50%;
+  background: var(--background-action-high-purple-glycine, #6e445a); z-index: 3; }
+.courbe-lacune { position: absolute; top: 0; bottom: 0;
+  background-image: repeating-linear-gradient(45deg,
+    transparent, transparent 3px,
+    var(--border-default-grey) 3px, var(--border-default-grey) 4px); }
+.courbe-repere { position: absolute; top: 0; bottom: 0; border-left: 2px solid var(--border-plain-grey); }
+.courbe-dates { position: relative; height: 1.25rem; font-size: .6875rem;
+  color: var(--text-mention-grey); }
+.courbe-dates span { position: absolute; top: .25rem; transform: translateX(-50%); white-space: nowrap; }
+.courbe-dates span:first-child { transform: none; }
+.courbe-dates span:last-child { transform: translateX(-100%); }
+@media (max-width: 36em) { .courbe-dates span.secondaire { display: none; } }
+.marque-lacune { display: inline-block; width: .8rem; height: .8rem; margin-right: .4rem;
+  vertical-align: -.1rem; background-image: repeating-linear-gradient(45deg,
+    transparent, transparent 2px, var(--border-default-grey) 2px, var(--border-default-grey) 3px); }
 .marque-repere { display: inline-block; width: .8rem; height: .8rem; margin-right: .4rem;
-  vertical-align: -.1rem; background: var(--background-contrast-grey);
-  box-shadow: inset 0 3px 0 var(--border-plain-grey); }
+  vertical-align: -.1rem; border-left: 2px solid var(--border-plain-grey); }
 /* --- Échelle : graduations à gauche et à droite, lignes de repère --- */
 /* La zone de tracé mesure 11rem dans les deux histogrammes : les axes ont la
    même hauteur, et une graduation à x % tombe sur la ligne à x %. */
 .graphe { display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
   column-gap: .375rem; align-items: start; padding-top: .5rem; }
-.axe { position: relative; height: 11rem; font-size: .6875rem; line-height: 1;
+.axe { position: relative; height: var(--hauteur, 11rem); font-size: .6875rem; line-height: 1;
   color: var(--text-mention-grey); font-variant-numeric: tabular-nums; }
 .axe-gabarit { visibility: hidden; white-space: nowrap; }
 .axe-valeur { position: absolute; transform: translateY(50%); white-space: nowrap; }
 .axe--g .axe-valeur { right: 0; }
 .axe--d .axe-valeur { left: 0; }
-.grille { position: absolute; left: 0; right: 0; top: 0; height: 11rem; pointer-events: none; z-index: 1; }
+.grille { position: absolute; left: 0; right: 0; top: 0; height: var(--hauteur, 11rem); pointer-events: none; z-index: 1; }
 .grille span { position: absolute; left: 0; right: 0;
   border-top: 1px dashed var(--border-default-grey); }
 
