@@ -1,0 +1,348 @@
+{
+ "date": "2026-11-01",
+ "diffusion": {
+  "delai_secondes": 169,
+  "depose_le": "2026-11-01T08:59:49.204000+00:00",
+  "empreinte_miroir": "a1449124bfb9aac4e98efe524455649ddba58504",
+  "genere_le": "2026-11-01T09:57:00",
+  "mesure": true
+ },
+ "domaines": {
+  "ahnac.mssante.fr": [
+   618,
+   1,
+   0
+  ],
+  "aphp.mssante.fr": [
+   12674,
+   2,
+   1
+  ],
+  "aquitaine.mssante.fr": [
+   1041,
+   1,
+   0
+  ],
+  "armorsante.mssante.fr": [
+   1088,
+   1,
+   0
+  ],
+  "aura.mssante.fr": [
+   63170,
+   8,
+   1
+  ],
+  "caps-54-51.com.mssante.fr": [
+   245,
+   1,
+   0
+  ],
+  "cem.mssante.fr": [
+   163,
+   1,
+   0
+  ],
+  "ch-albi.mssante.fr": [
+   193,
+   0,
+   1
+  ],
+  "ch-brive.mssante.fr": [
+   328,
+   0,
+   1
+  ],
+  "ch-edouard-toulouse.mssante.fr": [
+   466,
+   0,
+   1
+  ],
+  "ch-havre.mssante.fr": [
+   652,
+   0,
+   1
+  ],
+  "ch-lemans.mssante.fr": [
+   747,
+   1,
+   0
+  ],
+  "ch-saintnazaire.mssante.fr": [
+   604,
+   0,
+   1
+  ],
+  "ch-saumur.mssante.fr": [
+   218,
+   0,
+   1
+  ],
+  "ch-stquentin.mssante.fr": [
+   213,
+   0,
+   1
+  ],
+  "ch-troyes.mssante.fr": [
+   600,
+   1,
+   2
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   5054,
+   8,
+   25
+  ],
+  "chorus.mssante.fr": [
+   1230,
+   2,
+   0
+  ],
+  "chru-nancy.mssante.fr": [
+   1950,
+   7,
+   2
+  ],
+  "chru-strasbourg.mssante.fr": [
+   2070,
+   1,
+   0
+  ],
+  "chsjsl.aura.mssante.fr": [
+   471,
+   0,
+   1
+  ],
+  "chu-amiens.mssante.fr": [
+   1551,
+   2,
+   0
+  ],
+  "chu-angers.mssante.fr": [
+   2175,
+   0,
+   3
+  ],
+  "chu-bordeaux.mssante.fr": [
+   2839,
+   0,
+   1
+  ],
+  "chu-grenoble.aura.mssante.fr": [
+   2345,
+   2,
+   0
+  ],
+  "chu-limoges.mssante.fr": [
+   2173,
+   0,
+   6
+  ],
+  "chu-nimes.mssante.fr": [
+   1199,
+   1,
+   0
+  ],
+  "chu-reims.mssante.fr": [
+   2190,
+   6,
+   0
+  ],
+  "chu-toulouse.mssante.fr": [
+   8478,
+   49,
+   1
+  ],
+  "chu-tours.mssante.fr": [
+   1525,
+   1,
+   0
+  ],
+  "clinique-quercy.mssante.fr": [
+   2,
+   0,
+   1
+  ],
+  "curie.mssante.fr": [
+   498,
+   1,
+   1
+  ],
+  "diaverum.mssante.fr": [
+   99,
+   0,
+   1
+  ],
+  "emeis.mssante.fr": [
+   3087,
+   1,
+   0
+  ],
+  "epsbd.mssante.fr": [
+   181,
+   0,
+   1
+  ],
+  "esantepdl.mssante.fr": [
+   2220,
+   5,
+   12
+  ],
+  "for.mssante.fr": [
+   644,
+   3,
+   0
+  ],
+  "gh-artoisternois.mssante.fr": [
+   451,
+   0,
+   1
+  ],
+  "ghpsj.mssante.fr": [
+   1196,
+   10,
+   0
+  ],
+  "ght974.mssante.fr": [
+   809,
+   1,
+   0
+  ],
+  "hcs-sante.mssante.fr": [
+   600,
+   1,
+   2
+  ],
+  "icm46.mssante.fr": [
+   69,
+   0,
+   1
+  ],
+  "infirmier.mssante.fr": [
+   16975,
+   58,
+   75
+  ],
+  "inicea.mssante.fr": [
+   1276,
+   0,
+   1
+  ],
+  "lgpi.mssante.fr": [
+   3892,
+   13,
+   9
+  ],
+  "lifen.mssante.fr": [
+   13875,
+   1,
+   421
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8527,
+   29,
+   47
+  ],
+  "medecin.mssante.fr": [
+   64729,
+   57,
+   56
+  ],
+  "medecin.oc.mssante.fr": [
+   4826,
+   4,
+   1
+  ],
+  "na.mssante.fr": [
+   3703,
+   1,
+   0
+  ],
+  "orthophoniste.mssante.fr": [
+   9375,
+   8,
+   37
+  ],
+  "pc.mssante.fr": [
+   1116,
+   1,
+   0
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1260,
+   1,
+   7
+  ],
+  "pharmacie-paca.mssante.fr": [
+   1483,
+   2,
+   1
+  ],
+  "pharmacie.hdf.mssante.fr": [
+   501,
+   3,
+   0
+  ],
+  "pharmacien.mssante.fr": [
+   7557,
+   20,
+   25
+  ],
+  "pharmacien.oc.mssante.fr": [
+   2076,
+   1,
+   0
+  ],
+  "prevaly.mssante.fr": [
+   157,
+   1,
+   0
+  ],
+  "pro.mssante.fr": [
+   25898,
+   59,
+   87
+  ],
+  "pst38.mssante.fr": [
+   94,
+   6,
+   1
+  ],
+  "sage-femme.mssante.fr": [
+   5830,
+   6,
+   3
+  ],
+  "ssa.mssante.fr": [
+   5463,
+   0,
+   9
+  ],
+  "ugecam-alpc.cnamts.mssante.fr": [
+   75,
+   0,
+   1
+  ],
+  "vivalto-sante.mssante.fr": [
+   1477,
+   0,
+   1
+  ]
+ },
+ "fetched_at": "2026-11-01T10:20:58+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 560520,
+ "modifications": null,
+ "national": {
+  "creations": 389,
+  "suppressions": 852,
+  "total_bal": 560337
+ },
+ "par_type": {
+  "ORG": 92657,
+  "PER": 467680
+ },
+ "source_fingerprint": "2d52fd5d3c626ded4566e848ddebfae9770faafb1ddba67d088d441e2b3aad0a",
+ "source_timestamp": "2026-11-01T09:57:00",
+ "statut": "nominal"
+}
