@@ -1,0 +1,273 @@
+{
+ "date": "2026-11-08",
+ "diffusion": {
+  "delai_secondes": 188,
+  "depose_le": "2026-11-08T08:11:08.366000+00:00",
+  "empreinte_miroir": "6f9d9d16895be7236cab070617794cd4b45f8825",
+  "genere_le": "2026-11-08T09:08:00",
+  "mesure": true
+ },
+ "domaines": {
+  "abaautisme.mssante.fr": [
+   28,
+   2,
+   0
+  ],
+  "aphm.mssante.fr": [
+   2994,
+   1,
+   0
+  ],
+  "aphp.mssante.fr": [
+   12363,
+   0,
+   1
+  ],
+  "aura.mssante.fr": [
+   63289,
+   5,
+   3
+  ],
+  "ch-ardeche-nord.aura.mssante.fr": [
+   128,
+   0,
+   1
+  ],
+  "ch-cesame-angers.mssante.fr": [
+   162,
+   0,
+   1
+  ],
+  "ch-chalon71.mssante.fr": [
+   1261,
+   1,
+   0
+  ],
+  "ch-cholet.mssante.fr": [
+   590,
+   1,
+   1
+  ],
+  "ch-fougeres.mssante.fr": [
+   128,
+   0,
+   1
+  ],
+  "ch-grasse.mssante.fr": [
+   409,
+   1,
+   0
+  ],
+  "ch-lorquin.mssante.fr": [
+   137,
+   79,
+   13
+  ],
+  "ch-perigueux.mssante.fr": [
+   306,
+   1,
+   0
+  ],
+  "ch-poitiers.mssante.fr": [
+   465,
+   0,
+   2
+  ],
+  "ch-rodez.mssante.fr": [
+   199,
+   0,
+   2
+  ],
+  "ch-stlo.mssante.fr": [
+   605,
+   0,
+   1
+  ],
+  "ch-troyes.mssante.fr": [
+   604,
+   1,
+   1
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   5080,
+   22,
+   15
+  ],
+  "chmy.aura.mssante.fr": [
+   133,
+   0,
+   1
+  ],
+  "chorus.mssante.fr": [
+   1244,
+   5,
+   1
+  ],
+  "chru-nancy.mssante.fr": [
+   1965,
+   0,
+   1
+  ],
+  "chu-angers.mssante.fr": [
+   2132,
+   1,
+   2
+  ],
+  "chu-bordeaux.mssante.fr": [
+   2877,
+   0,
+   1
+  ],
+  "chu-grenoble.aura.mssante.fr": [
+   2344,
+   0,
+   1
+  ],
+  "chu-limoges.mssante.fr": [
+   2100,
+   1,
+   0
+  ],
+  "chu-nimes.mssante.fr": [
+   1297,
+   3,
+   0
+  ],
+  "chu-reims.mssante.fr": [
+   2125,
+   1,
+   0
+  ],
+  "chu-rouen.mssante.fr": [
+   1546,
+   2,
+   0
+  ],
+  "chu-toulouse.mssante.fr": [
+   8579,
+   4,
+   0
+  ],
+  "chu-tours.mssante.fr": [
+   1537,
+   1,
+   0
+  ],
+  "diaverum.mssante.fr": [
+   100,
+   1,
+   0
+  ],
+  "emeis.mssante.fr": [
+   3120,
+   2,
+   3
+  ],
+  "esantepdl.mssante.fr": [
+   2229,
+   2,
+   6
+  ],
+  "gcs-ardenne-nord.mssante.fr": [
+   15,
+   0,
+   1
+  ],
+  "ghrmsa.mssante.fr": [
+   742,
+   0,
+   1
+  ],
+  "ght974.mssante.fr": [
+   820,
+   3,
+   0
+  ],
+  "groupesos.mssante.fr": [
+   433,
+   2,
+   0
+  ],
+  "hcs-sante.mssante.fr": [
+   604,
+   1,
+   1
+  ],
+  "infirmier.mssante.fr": [
+   17155,
+   54,
+   54
+  ],
+  "interop-mssante.apicrypt.org": [
+   23901,
+   41,
+   0
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8546,
+   39,
+   35
+  ],
+  "medecin.mssante.fr": [
+   65453,
+   62,
+   57
+  ],
+  "medecin.oc.mssante.fr": [
+   4852,
+   0,
+   1
+  ],
+  "orthophoniste.mssante.fr": [
+   9394,
+   24,
+   49
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1282,
+   4,
+   0
+  ],
+  "pharmacien.mssante.fr": [
+   7605,
+   28,
+   23
+  ],
+  "pro.mssante.fr": [
+   26181,
+   72,
+   102
+  ],
+  "resamut.aura.mssante.fr": [
+   295,
+   1,
+   0
+  ],
+  "sage-femme.mssante.fr": [
+   5845,
+   3,
+   4
+  ],
+  "santelys.mssante.fr": [
+   350,
+   1,
+   0
+  ]
+ },
+ "fetched_at": "2026-11-08T10:10:24+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 562541,
+ "modifications": null,
+ "national": {
+  "creations": 472,
+  "suppressions": 386,
+  "total_bal": 562348
+ },
+ "par_type": {
+  "ORG": 93002,
+  "PER": 469346
+ },
+ "source_fingerprint": "db16c7dfff4d7ac9b119d6e238d1bb9d8413c2abd99a8f3e1b503522bcc8943d",
+ "source_timestamp": "2026-11-08T09:08:00",
+ "statut": "nominal"
+}
