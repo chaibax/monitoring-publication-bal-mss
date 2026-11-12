@@ -1,0 +1,223 @@
+{
+ "date": "2026-11-12",
+ "diffusion": {
+  "delai_secondes": 209,
+  "depose_le": "2026-11-12T08:31:29.811000+00:00",
+  "empreinte_miroir": "5faca90a399ada01787f0888dbf080d0e4ed1924",
+  "genere_le": "2026-11-12T09:28:00",
+  "mesure": true
+ },
+ "domaines": {
+  "aphm.mssante.fr": [
+   2998,
+   2,
+   0
+  ],
+  "armorsante.mssante.fr": [
+   1086,
+   0,
+   1
+  ],
+  "aura.mssante.fr": [
+   63336,
+   2,
+   0
+  ],
+  "ch-argenteuil.mssante.fr": [
+   396,
+   4,
+   4
+  ],
+  "ch-cadillac.mssante.fr": [
+   99,
+   1,
+   0
+  ],
+  "ch-chalonsenchampagne.mssante.fr": [
+   247,
+   1,
+   0
+  ],
+  "ch-laon.mssante.fr": [
+   219,
+   1,
+   0
+  ],
+  "ch-le-vinatier.aura.mssante.fr": [
+   354,
+   0,
+   1
+  ],
+  "ch-nanterre.mssante.fr": [
+   135,
+   0,
+   1
+  ],
+  "ch-poitiers.mssante.fr": [
+   466,
+   1,
+   0
+  ],
+  "ch-simoneveil.mssante.fr": [
+   349,
+   0,
+   3
+  ],
+  "ch-stlo.mssante.fr": [
+   606,
+   1,
+   0
+  ],
+  "ch-troyes.mssante.fr": [
+   606,
+   1,
+   0
+  ],
+  "chirurgien-dentiste.mssante.fr": [
+   5082,
+   20,
+   4
+  ],
+  "chorus.mssante.fr": [
+   1249,
+   1,
+   0
+  ],
+  "chru-nancy.mssante.fr": [
+   1970,
+   1,
+   0
+  ],
+  "chu-lyon.aura.mssante.fr": [
+   6768,
+   1,
+   0
+  ],
+  "chu-nimes.mssante.fr": [
+   1299,
+   1,
+   0
+  ],
+  "chu-reims.mssante.fr": [
+   2125,
+   1,
+   0
+  ],
+  "chu-rennes.mssante.fr": [
+   1571,
+   1,
+   0
+  ],
+  "chu-rouen.mssante.fr": [
+   1548,
+   1,
+   1
+  ],
+  "chu-toulouse.mssante.fr": [
+   8576,
+   7,
+   0
+  ],
+  "curie.mssante.fr": [
+   487,
+   0,
+   1
+  ],
+  "esantepdl.mssante.fr": [
+   2233,
+   8,
+   2
+  ],
+  "ghpsj.mssante.fr": [
+   1200,
+   1,
+   0
+  ],
+  "hcs-sante.mssante.fr": [
+   606,
+   1,
+   0
+  ],
+  "infirmier.mssante.fr": [
+   17262,
+   71,
+   22
+  ],
+  "interop-mssante.apicrypt.org": [
+   23906,
+   2,
+   18
+  ],
+  "masseur-kinesitherapeute.mssante.fr": [
+   8554,
+   57,
+   14
+  ],
+  "medecin.mssante.fr": [
+   65616,
+   73,
+   10
+  ],
+  "medecin.oc.mssante.fr": [
+   4848,
+   1,
+   0
+  ],
+  "orthophoniste.mssante.fr": [
+   9408,
+   35,
+   7
+  ],
+  "pedicure-podologue.mssante.fr": [
+   1283,
+   5,
+   0
+  ],
+  "pharmacie.bfc.mssante.fr": [
+   231,
+   0,
+   1
+  ],
+  "pharmacien.mssante.fr": [
+   7645,
+   22,
+   6
+  ],
+  "pro.mssante.fr": [
+   26299,
+   98,
+   11
+  ],
+  "sage-femme.mssante.fr": [
+   5849,
+   5,
+   1
+  ],
+  "santexceljura.mssante.fr": [
+   18,
+   2,
+   0
+  ],
+  "soleyanouportlouis.mssante.fr": [
+   5,
+   1,
+   0
+  ]
+ },
+ "fetched_at": "2026-11-12T10:55:25+00:00",
+ "lignes_ignorees": 0,
+ "lignes_lues": 563013,
+ "modifications": null,
+ "national": {
+  "creations": 430,
+  "suppressions": 108,
+  "total_bal": 562807
+ },
+ "par_type": {
+  "ORG": 93075,
+  "PER": 469732
+ },
+ "source_fingerprint": "81c035d7dbd08b5d566d0822c0ad5018b1989c37b3e5d4b0e31085374e722245",
+ "source_timestamp": "2026-11-12T09:28:00",
+ "statut": "nominal"
+}
