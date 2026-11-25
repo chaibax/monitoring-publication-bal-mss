@@ -1,3 +1,4 @@
+import ssl
 import urllib.error
 
 import pytest
@@ -47,38 +48,89 @@ class _ReponseFactice:
     def __exit__(self, *a): return False
 
 
-def test_la_sonde_bascule_sur_le_miroir_si_le_service_ans_refuse(monkeypatch):
-    """L'ANS limite le débit de son service et répond 429. Un refus passager
-    ne doit pas interrompre la supervision : le fichier est de toute façon
-    distribué par data.gouv, vers qui l'ANS redirige lui-même."""
+MIROIR = {
+    "nom_fichier": "extraction-correspondance-mssante-202610161108.zip",
+    "taille": 21702416,
+    "empreinte_sha1": "e8f35a8e",
+}
+
+
+def test_la_sonde_interroge_d_abord_le_miroir(monkeypatch):
+    """L'ANS ne fait plus que rediriger vers data.gouv : le miroir est la
+    voie directe, et le service de l'ANS n'est même pas sollicité."""
     from ingest import sources
 
-    def refuse(*a, **k):
-        raise urllib.error.HTTPError("url", 429, "Too Many Requests", {}, None)
+    def interdit(*a, **k):
+        raise AssertionError("le service de l'ANS ne doit pas être sollicité")
 
-    monkeypatch.setattr(sources.urllib.request, "urlopen", refuse)
-    monkeypatch.setattr(sources, "metadonnees_archive_datagouv", lambda: {
-        "nom_fichier": "extraction-correspondance-mssante-202610161108.zip",
-        "taille": 21702416,
-        "empreinte_sha1": "e8f35a8e",
-    })
+    monkeypatch.setattr(sources, "metadonnees_archive_datagouv", lambda: MIROIR)
+    monkeypatch.setattr(sources, "_sonder_service_ans", interdit)
 
-    sonde = sources.sonder_ans()
+    sonde = sources.sonder_source()
 
+    assert sonde.via == "data.gouv.fr"
     assert sonde.horodatage_generation.isoformat() == "2026-10-16T11:08:00"
     assert sonde.taille_archive == 21702416
-    assert sonde.via == "data.gouv.fr"
 
 
-def test_la_sonde_privilegie_le_service_de_l_ans_quand_il_repond(monkeypatch):
+@pytest.mark.parametrize("panne", [
+    urllib.error.HTTPError("url", 503, "Service Unavailable", {}, None),
+    ssl.SSLError(1, "[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure"),
+    ConnectionResetError(54, "Connection reset by peer"),
+    KeyError("resources"),
+])
+def test_toute_panne_du_miroir_bascule_sur_le_service_de_l_ans(monkeypatch, panne):
+    """Aucune liste fermée d'exceptions. Le 17 novembre 2026, une
+    `ssl.SSLError` — que `urllib` n'enveloppe pas en `URLError` — a traversé
+    la voie de repli et arrêté la collecte huit jours."""
     from ingest import sources
 
+    def tombe():
+        raise panne
+
+    monkeypatch.setattr(sources, "metadonnees_archive_datagouv", tombe)
     monkeypatch.setattr(sources.urllib.request, "urlopen", lambda *a, **k: _ReponseFactice(
         "https://static.data.gouv.fr/x/extraction-correspondance-mssante-202610161108.zip",
         {"Content-Length": "21702416"},
     ))
 
-    sonde = sources.sonder_ans()
+    sonde = sources.sonder_source()
 
     assert sonde.via == "service.annuaire.sante.fr"
     assert sonde.horodatage_generation.isoformat() == "2026-10-16T11:08:00"
+
+
+def test_la_sonde_echoue_franchement_quand_toutes_les_voies_tombent(monkeypatch):
+    """Si rien ne répond, l'erreur cite chaque voie et son motif : c'est ce
+    que lira la personne alertée."""
+    from ingest import sources
+
+    def tombe(*a, **k):
+        raise ssl.SSLError(1, "handshake failure")
+
+    monkeypatch.setattr(sources, "metadonnees_archive_datagouv", tombe)
+    monkeypatch.setattr(sources.urllib.request, "urlopen", tombe)
+
+    with pytest.raises(sources.SourceInjoignable) as erreur:
+        sources.sonder_source()
+
+    assert "data.gouv.fr" in str(erreur.value)
+    assert "service.annuaire.sante.fr" in str(erreur.value)
+
+
+def test_le_telechargement_bascule_sur_l_ans_si_le_miroir_tombe(monkeypatch, tmp_path):
+    from ingest import sources
+
+    appels = []
+
+    def telecharger(adresse, contexte, destination):
+        appels.append(adresse)
+        if adresse == sources.URL_TELECHARGEMENT_DATAGOUV:
+            raise ssl.SSLError(1, "handshake failure")
+        return destination
+
+    monkeypatch.setattr(sources, "_telecharger", telecharger)
+
+    sources.telecharger_archive(tmp_path / "a.zip")
+
+    assert appels == [sources.URL_TELECHARGEMENT_DATAGOUV, sources.URL_EXTRACTION_ANS]

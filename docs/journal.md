@@ -245,6 +245,51 @@ retard. La vigie échoue si aucun état n'existe.
 sont estimés au rythme mesuré autour d'elle et tracés en pointillés,
 distincts de la mesure, et la synthèse les présente sur une ligne à part.
 
+## 25/11/2026 — Deuxième panne de l'outil, du 17 au 25 novembre
+
+### Décision 12 — Le miroir d'abord, aucune liste fermée d'erreurs, et un ticket nominatif
+
+**Ce qui s'est passé.** Le 17 novembre, le service d'extraction de l'ANS a
+commencé à renégocier la connexion TLS après réception de la requête, pour
+exiger un certificat client que l'outil n'a pas. Python lève alors une
+`ssl.SSLError` brute — `urllib` ne l'enveloppe pas en `URLError`, contrairement
+à une erreur pendant la poignée de main. La voie de repli vers data.gouv,
+posée par la décision 10, n'attrapait qu'une liste fermée d'exceptions : celle-ci
+l'a traversée, et la sonde a échoué cinq fois par jour pendant huit jours. Le
+miroir data.gouv, lui, a été alimenté normalement tous les jours.
+
+**Ce que coûte la panne.** Rien sur les mouvements : la vigie a gardé l'état de
+référence en vie (décision 11), le relevé du 25 compare donc au 16 et compte
+tout ce qui a bougé entre-temps. En revanche les jours du 17 au 24 n'ont pas de
+relevé propre ; leur détail jour par jour est perdu, data.gouv ne conservant
+que la version courante.
+
+**Ce qui a de nouveau manqué : la remontée.** La vigie a sonné dès le 19 et
+chaque jour ensuite. La décision 10 l'avait déjà écrit — « c'est la remontée
+humaine qui a manqué, pas la détection » — sans que rien change : le webhook
+Slack n'a jamais été posé, et le courriel générique de GitHub sur l'échec d'une
+tâche planifiée se noie. C'est la vraie cause de la récidive.
+
+**Ce qui est corrigé.**
+
+1. **Le miroir d'abord.** Sonde et téléchargement interrogent data.gouv en
+   premier, le service de l'ANS en second. L'ANS ne faisait plus que rediriger
+   vers ce même miroir ; il exige désormais un certificat client. C'est le
+   même fichier au même horodatage, par une voie de moins. Cela clôt la reprise
+   de la décision 1 annoncée par la décision 10 : la source de contenu est
+   data.gouv, le service de l'ANS n'est plus qu'une voie de secours.
+2. **Aucune liste fermée.** Toute exception compte comme l'échec d'une voie et
+   fait passer à la suivante ; si toutes tombent, l'erreur les cite toutes. On
+   ne peut pas énumérer les façons de tomber d'un serveur tiers. La sonde a son
+   propre délai de 60 s, sous le plafond de trois minutes de son job.
+3. **Un ticket nominatif.** Supervision et Vigie se terminent par un job
+   `alerte` qui ouvre un ticket GitHub mentionnant le propriétaire du dépôt au
+   premier échec (étiquettes `panne-collecte` et `panne-vigie`), n'en ouvre
+   jamais un second tant que le premier est ouvert, et le ferme seul au premier
+   succès. Une mention produit une notification nominative ; un ticket ouvert
+   reste visible tant que dure la panne. Supervision alerte dès le premier
+   échec, sans attendre les 48 heures de la vigie.
+
 ---
 
 ## Surprises sur les données

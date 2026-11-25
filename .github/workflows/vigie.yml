@@ -1,9 +1,10 @@
 # Vigie de l'outil lui-même.
 #
 # Le pire résultat possible serait qu'une panne de l'outil soit prise pour
-# une panne de la chaîne MSSanté. Cette tâche échoue — et GitHub prévient
-# alors le propriétaire du dépôt — dès que plus aucun agrégat n'a été produit
-# depuis 48 heures. Elle couvre aussi bien une source injoignable qu'une
+# une panne de la chaîne MSSanté. Cette tâche échoue — et ouvre un ticket qui
+# mentionne le propriétaire du dépôt (job `alerte`) — dès que plus aucun
+# agrégat n'a été produit depuis 48 heures. L'échec seul ne prévient personne
+# utilement : voir la décision 12. Elle couvre aussi bien une source injoignable qu'une
 # désactivation des tâches planifiées après soixante jours d'inactivité.
 #
 # Deux règles, parce qu'il y a deux façons de s'arrêter. Produire n'est pas
@@ -126,3 +127,37 @@ jobs:
             exit 1
           fi
           echo "État relu : ${{ steps.etat.outputs.cache-matched-key }} ($(du -h .cache/etat.bin | cut -f1))."
+
+  # La vigie détectait déjà : c'est la remontée qui manquait (décision 12).
+  alerte:
+    name: Remontée humaine
+    needs: [fraicheur, memoire]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXECUTION: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ouvrir un ticket si la vigie a sonné
+        if: needs.fraicheur.result == 'failure' || needs.memoire.result == 'failure'
+        run: |
+          bash .github/alerte.sh ouvrir panne-vigie \
+            "Vigie : données périmées ou mémoire de l'outil absente" \
+            "@${{ github.repository_owner }} — la vigie de l'outil a sonné (fraîcheur : ${{ needs.fraicheur.result }}, mémoire : ${{ needs.memoire.result }}).
+
+          Soit plus aucun agrégat depuis 48 heures, soit le site ne les publie plus, soit l'état de référence a disparu du cache.
+
+          Détail de l'exécution : $EXECUTION
+
+          Ce ticket se fermera tout seul quand la vigie repassera au vert."
+
+      - name: Fermer le ticket si la vigie est au vert
+        if: needs.fraicheur.result == 'success' && needs.memoire.result == 'success'
+        run: |
+          bash .github/alerte.sh fermer panne-vigie "Vigie au vert : $EXECUTION"

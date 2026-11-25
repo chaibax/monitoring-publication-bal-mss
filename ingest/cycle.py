@@ -32,9 +32,9 @@ from ingest.reconstitution import (
 from ingest.sources import (
     contexte_public,
     lignes_de_l_archive,
-    sonder_ans,
     sonder_datagouv,
-    telecharger_ans,
+    sonder_source,
+    telecharger_archive,
 )
 
 RACINE = Path(__file__).resolve().parent.parent
@@ -69,7 +69,7 @@ def agregat_precedent(jour):
 
 def sonde():
     """Couche 0 : la source produit-elle, et est-ce nouveau ?"""
-    ans = sonder_ans()
+    ans = sonder_source()
     connus = sorted(DOSSIER_AGREGATS.glob("*.json"))
     dernier = json.loads(connus[-1].read_text()) if connus else None
     connu = dernier["source_timestamp"] if dernier else None
@@ -118,11 +118,11 @@ def doit_conserver_l_existant(jour, enregistrement):
 
 def traitement():
     """Cycle complet : télécharger, lire, comparer, écrire."""
-    ans = sonder_ans()
+    ans = sonder_source()
     jour = ans.horodatage_generation.date()
 
     with tempfile.TemporaryDirectory() as travail:
-        archive = telecharger_ans(Path(travail) / ans.nom_fichier)
+        archive = telecharger_archive(Path(travail) / ans.nom_fichier)
         observation = lire_extraction(lignes_de_l_archive(archive), sel=sel())
 
     precedent = agregat_precedent(jour)

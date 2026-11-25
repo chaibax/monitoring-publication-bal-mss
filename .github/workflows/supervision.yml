@@ -118,3 +118,40 @@ jobs:
       - name: Signaler l'absence de jeton de déploiement
         if: env.NETLIFY_AUTH_TOKEN == ''
         run: echo "::warning::NETLIFY_AUTH_TOKEN absent — les agrégats sont publiés, le site n'est pas redéployé."
+
+  # Détecter ne suffit pas : en octobre comme en novembre 2026, la panne a été
+  # vue dès le premier jour et n'est parvenue à personne pendant une semaine.
+  # Ce job ouvre un ticket nominatif au premier échec et le ferme au premier
+  # relevé réussi. Voir .github/alerte.sh et la décision 12.
+  alerte:
+    name: Remontée humaine
+    needs: [sonde, traitement]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXECUTION: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ouvrir un ticket si la collecte a échoué
+        if: needs.sonde.result == 'failure' || needs.traitement.result == 'failure'
+        run: |
+          bash .github/alerte.sh ouvrir panne-collecte \
+            "Panne de la collecte — le site ne se met plus à jour" \
+            "@${{ github.repository_owner }} — la tâche Supervision a échoué (sonde : ${{ needs.sonde.result }}, traitement : ${{ needs.traitement.result }}).
+
+          Tant que ce ticket est ouvert, le site sert des données figées. Ce n'est pas, en soi, une panne de la chaîne MSSanté : c'est l'outil qui ne voit plus.
+
+          Détail de l'exécution : $EXECUTION
+
+          Ce ticket se fermera tout seul au premier relevé réussi."
+
+      - name: Fermer le ticket si la collecte a abouti
+        if: needs.sonde.result == 'success' && (needs.traitement.result == 'success' || needs.traitement.result == 'skipped')
+        run: |
+          bash .github/alerte.sh fermer panne-collecte "Collecte rétablie : $EXECUTION"

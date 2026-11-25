@@ -22,8 +22,9 @@ maillons, jamais sur un domaine pris isolément.
 
 | Source | Rôle | Accès |
 |---|---|---|
-| [Extraction MSSanté de l'ANS](https://annuaire.sante.fr/web/site-pro/extractions-mss) | contenu, en amont | libre |
-| [Miroir data.gouv.fr](https://www.data.gouv.fr/datasets/annuaire-sante-extraction-des-bal-mssante) | témoin du délai de diffusion | libre |
+| [Archive data.gouv.fr](https://www.data.gouv.fr/datasets/annuaire-sante-extraction-des-bal-mssante-format-zip) | contenu (voie principale depuis le 25/11/2026) | libre |
+| [Extraction MSSanté de l'ANS](https://annuaire.sante.fr/web/site-pro/extractions-mss) | voie de secours ; redirige vers data.gouv | libre |
+| [Miroir data.gouv.fr (texte)](https://www.data.gouv.fr/datasets/annuaire-sante-extraction-des-bal-mssante) | témoin du délai de diffusion | libre |
 | [API FHIR Annuaire Santé](https://gateway.api.esante.gouv.fr/fhir/v2) | signal de vie de l'annuaire | clé publique gratuite |
 
 Leur intérêt vient de leur indépendance : croiser deux sources localise le
@@ -59,6 +60,11 @@ Tests : `python -m pytest`
 | `Supervision` | 03:10, 07:10, 11:10, 15:10, 19:10 UTC | sonde les en-têtes, traite si la source a bougé, publie et déploie |
 | `Vigie de l'outil` | 09:40 UTC | échoue si plus aucun agrégat depuis 48 h |
 
+Chaque tâche se termine par un job `alerte` : au premier échec, il ouvre un
+ticket GitHub qui mentionne le propriétaire du dépôt (étiquette
+`panne-collecte` ou `panne-vigie`), et le ferme au premier succès. C'est ce
+ticket, et non l'échec de la tâche, qui prévient quelqu'un.
+
 Secrets et variables attendus dans le dépôt :
 
 | Nom | Type | Nécessaire à |
@@ -66,7 +72,7 @@ Secrets et variables attendus dans le dépôt :
 | `MONITORING_SEL` | secret | empreintes salées des adresses |
 | `NETLIFY_AUTH_TOKEN` | secret | redéploiement du site |
 | `NETLIFY_SITE_ID` | variable | redéploiement du site |
-| `SLACK_WEBHOOK` | secret, facultatif | alerte de la vigie |
+| `SLACK_WEBHOOK` | secret, facultatif | alerte Slack de la vigie, en plus du ticket |
 
 Sans `NETLIFY_AUTH_TOKEN`, les agrégats sont publiés dans Git mais le site
 n'est pas redéployé ; la tâche le signale par un avertissement.

@@ -121,33 +121,74 @@ def metadonnees_archive_datagouv(url=URL_ARCHIVE_DATAGOUV):
     }
 
 
-def sonder_ans(url=URL_EXTRACTION_ANS):
-    """Couche 0 : la source produit-elle, et depuis quand ?"""
+DELAI_SONDE = 60
+"""La sonde tourne dans un job plafonné à trois minutes : une source qui
+pend ne doit pas consommer ce plafond avant que la suivante soit essayée."""
+
+
+class SourceInjoignable(RuntimeError):
+    """Aucune des voies n'a répondu. Le message les détaille toutes."""
+
+
+def _essayer_dans_l_ordre(voies):
+    """Première voie qui aboutit ; sinon une erreur qui les cite toutes.
+
+    Toute exception compte comme un échec de la voie, sans liste fermée de
+    types. Les deux pannes de l'outil venaient de là : en octobre une erreur
+    de certificat, le 17 novembre 2026 une renégociation TLS refusée
+    (`ssl.SSLError`, que `urllib` n'enveloppe pas en `URLError`). Chaque fois
+    une erreur que la liste n'avait pas prévue a traversé la voie de repli
+    et arrêté la collecte. On ne peut pas énumérer les façons de tomber
+    d'un serveur tiers ; on peut refuser qu'une seule d'entre elles suffise.
+    """
+    echecs = []
+    for nom, voie in voies:
+        try:
+            return voie()
+        except Exception as motif:  # noqa: BLE001 - voir la docstring
+            echecs.append(f"{nom} : {type(motif).__name__}: {motif}")
+    raise SourceInjoignable(" | ".join(echecs))
+
+
+def _sonder_miroir():
+    miroir = metadonnees_archive_datagouv()
+    return SondeANS(
+        horodatage_generation=horodatage_depuis_nom_de_fichier(miroir["nom_fichier"]),
+        taille_archive=int(miroir["taille"] or 0),
+        nom_fichier=miroir["nom_fichier"],
+        via="data.gouv.fr",
+        empreinte_sha1=miroir["empreinte_sha1"],
+    )
+
+
+def _sonder_service_ans(url=URL_EXTRACTION_ANS):
     requete = urllib.request.Request(url, method="HEAD")
-    try:
-        with urllib.request.urlopen(requete, timeout=DELAI, context=contexte_ans()) as reponse:
-            disposition = reponse.headers.get("Content-Disposition", "")
-            # data.gouv répond `Content-Disposition: attachment`, sans nom :
-            # après redirection, l'horodatage ne subsiste que dans l'URL.
-            trouve = MOTIF_NOM.search(disposition)
-            nom = trouve.group(1) if trouve else reponse.url.rsplit("/", 1)[-1]
-            return SondeANS(
-                horodatage_generation=horodatage_depuis_nom_de_fichier(nom),
-                taille_archive=int(reponse.headers.get("Content-Length", 0)),
-                nom_fichier=nom,
-            )
-    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError):
-        # L'ANS limite le débit de son service et redirige de toute façon vers
-        # data.gouv : un refus passager ne doit pas interrompre la supervision.
-        # On note la voie empruntée plutôt que de faire comme si de rien n'était.
-        miroir = metadonnees_archive_datagouv()
+    with urllib.request.urlopen(requete, timeout=DELAI_SONDE, context=contexte_ans()) as reponse:
+        disposition = reponse.headers.get("Content-Disposition", "")
+        # data.gouv répond `Content-Disposition: attachment`, sans nom :
+        # après redirection, l'horodatage ne subsiste que dans l'URL.
+        trouve = MOTIF_NOM.search(disposition)
+        nom = trouve.group(1) if trouve else reponse.url.rsplit("/", 1)[-1]
         return SondeANS(
-            horodatage_generation=horodatage_depuis_nom_de_fichier(miroir["nom_fichier"]),
-            taille_archive=int(miroir["taille"] or 0),
-            nom_fichier=miroir["nom_fichier"],
-            via="data.gouv.fr",
-            empreinte_sha1=miroir["empreinte_sha1"],
+            horodatage_generation=horodatage_depuis_nom_de_fichier(nom),
+            taille_archive=int(reponse.headers.get("Content-Length", 0)),
+            nom_fichier=nom,
         )
+
+
+def sonder_source():
+    """Couche 0 : la source produit-elle, et depuis quand ?
+
+    Le miroir data.gouv d'abord. Depuis octobre 2026 l'ANS ne fait que
+    rediriger vers lui, et depuis le 17 novembre 2026 son service exige un
+    certificat client que l'outil n'a pas : c'est le même fichier, au même
+    horodatage, par une voie de moins. Le service de l'ANS reste en second,
+    pour le jour où la distribution changerait encore. Voir la décision 12.
+    """
+    return _essayer_dans_l_ordre([
+        ("data.gouv.fr", _sonder_miroir),
+        ("service.annuaire.sante.fr", _sonder_service_ans),
+    ])
 
 
 URL_TELECHARGEMENT_DATAGOUV = (
@@ -156,26 +197,25 @@ URL_TELECHARGEMENT_DATAGOUV = (
 """Lien stable vers l'archive sur le miroir, vers lequel l'ANS redirige."""
 
 
-def telecharger_ans(destination, url=URL_EXTRACTION_ANS):
+def _telecharger(adresse, contexte, destination):
+    requete = urllib.request.Request(adresse)
+    with urllib.request.urlopen(requete, timeout=DELAI, context=contexte) as reponse:
+        with open(destination, "wb") as fichier:
+            shutil.copyfileobj(reponse, fichier, length=1 << 20)
+    return Path(destination)
+
+
+def telecharger_archive(destination):
     """Rapatrie l'archive. Une vingtaine de méga-octets, quelques secondes.
 
-    Si le service de l'ANS refuse — il limite le débit — le fichier est pris
-    sur le miroir, qui est la cible de sa propre redirection.
+    Même ordre que la sonde : le miroir, puis le service de l'ANS.
     """
-    for adresse, contexte in (
-        (url, contexte_ans()),
-        (URL_TELECHARGEMENT_DATAGOUV, contexte_public()),
-    ):
-        try:
-            requete = urllib.request.Request(adresse)
-            with urllib.request.urlopen(requete, timeout=DELAI, context=contexte) as reponse:
-                with open(destination, "wb") as fichier:
-                    shutil.copyfileobj(reponse, fichier, length=1 << 20)
-            return Path(destination)
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
-            if adresse is URL_TELECHARGEMENT_DATAGOUV:
-                raise
-    raise RuntimeError("archive inaccessible par les deux voies")
+    return _essayer_dans_l_ordre([
+        ("data.gouv.fr",
+         lambda: _telecharger(URL_TELECHARGEMENT_DATAGOUV, contexte_public(), destination)),
+        ("service.annuaire.sante.fr",
+         lambda: _telecharger(URL_EXTRACTION_ANS, contexte_ans(), destination)),
+    ])
 
 
 def lignes_de_l_archive(chemin):
