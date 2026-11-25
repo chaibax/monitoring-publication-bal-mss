@@ -79,6 +79,10 @@ Secrets et variables attendus dans le dépôt :
 | `TCHAP_ROOM_ID` | variable, facultative | salon Tchap d'alerte (`!…:…`) |
 | `TCHAP_ACCESS_TOKEN` | secret, facultatif | jeton du compte robot Tchap |
 
+`TCHAP_ACCESS_TOKEN` et `TCHAP_HOMESERVER` se posent ensemble avec
+`python3 .github/tchap-jeton.py`, lancé soi-même : le jeton affiché par Tchap
+web est de courte durée et ne convient pas.
+
 Sans `NETLIFY_AUTH_TOKEN`, les agrégats sont publiés dans Git mais le site
 n'est pas redéployé ; la tâche le signale par un avertissement.
 
