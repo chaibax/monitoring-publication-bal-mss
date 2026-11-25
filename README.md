@@ -63,7 +63,10 @@ Tests : `python -m pytest`
 Chaque tâche se termine par un job `alerte` : au premier échec, il ouvre un
 ticket GitHub qui mentionne le propriétaire du dépôt (étiquette
 `panne-collecte` ou `panne-vigie`), et le ferme au premier succès. C'est ce
-ticket, et non l'échec de la tâche, qui prévient quelqu'un.
+ticket, et non l'échec de la tâche, qui prévient quelqu'un. Si le canal Tchap
+est configuré, chaque ouverture et fermeture y est aussi postée, et la vigie
+vérifie chaque jour que le compte robot peut encore poster (ticket
+`panne-tchap` sinon).
 
 Secrets et variables attendus dans le dépôt :
 
@@ -72,7 +75,9 @@ Secrets et variables attendus dans le dépôt :
 | `MONITORING_SEL` | secret | empreintes salées des adresses |
 | `NETLIFY_AUTH_TOKEN` | secret | redéploiement du site |
 | `NETLIFY_SITE_ID` | variable | redéploiement du site |
-| `SLACK_WEBHOOK` | secret, facultatif | alerte Slack de la vigie, en plus du ticket |
+| `TCHAP_HOMESERVER` | variable, facultative | serveur Tchap du compte robot |
+| `TCHAP_ROOM_ID` | variable, facultative | salon Tchap d'alerte (`!…:…`) |
+| `TCHAP_ACCESS_TOKEN` | secret, facultatif | jeton du compte robot Tchap |
 
 Sans `NETLIFY_AUTH_TOKEN`, les agrégats sont publiés dans Git mais le site
 n'est pas redéployé ; la tâche le signale par un avertissement.

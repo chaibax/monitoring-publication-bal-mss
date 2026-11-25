@@ -26,11 +26,7 @@ jobs:
     name: Âge des agrégats
     runs-on: ubuntu-latest
     timeout-minutes: 3
-    # Au niveau du job : un `env` de job est lisible dans le `if` d'un step,
-    # ce que ni `secrets` ni un `env` défini sur le step lui-même ne sont.
-    # Déclaré ici, le webhook conditionne réellement l'étape d'alerte.
     env:
-      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
       SITE_PUBLIE: https://monitoring-publication-bal-mss.netlify.app
     steps:
       - uses: actions/checkout@v4
@@ -85,21 +81,6 @@ jobs:
               )
           PY
 
-      - name: Prévenir sur Slack
-        if: failure() && env.SLACK_WEBHOOK != ''
-        run: |
-          curl -sS -X POST -H 'Content-type: application/json' --data "$(python - <<'PY'
-          import json, os
-          depot = os.environ.get("GITHUB_REPOSITORY", "")
-          execution = os.environ.get("GITHUB_RUN_ID", "")
-          print(json.dumps({"text":
-              ":warning: *Supervision BAL MSSanté* — l'outil ne produit plus d'agrégat "
-              "depuis plus de 48 heures, ou le site n'en publie plus. Règle déclenchée : "
-              "fraîcheur des agrégats. "
-              f"Détail : https://github.com/{depot}/actions/runs/{execution}"}))
-          PY
-          )" "$SLACK_WEBHOOK"
-
   # La mémoire de l'outil (empreintes salées du dernier relevé) vit dans le
   # cache GitHub, qui évince toute entrée non consultée pendant sept jours. Du
   # 10 au 16 octobre 2026, la collecte en panne ne l'a plus relue : elle a été
@@ -141,6 +122,9 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       EXECUTION: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      TCHAP_HOMESERVER: ${{ vars.TCHAP_HOMESERVER }}
+      TCHAP_ROOM_ID: ${{ vars.TCHAP_ROOM_ID }}
+      TCHAP_ACCESS_TOKEN: ${{ secrets.TCHAP_ACCESS_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -161,3 +145,25 @@ jobs:
         if: needs.fraicheur.result == 'success' && needs.memoire.result == 'success'
         run: |
           bash .github/alerte.sh fermer panne-vigie "Vigie au vert : $EXECUTION"
+
+      # Le canal Tchap peut tomber sans bruit : un compte Tchap expire faute de
+      # renouvellement par courriel. Contrôlé chaque jour, sans rien poster ;
+      # sa panne passe par un ticket, qui ne dépend pas de lui.
+      - name: Vérifier le canal Tchap
+        id: tchap
+        continue-on-error: true
+        run: python3 .github/tchap.py verifier
+
+      - name: Ouvrir un ticket si le canal Tchap ne répond plus
+        if: steps.tchap.outcome == 'failure'
+        run: |
+          bash .github/alerte.sh ouvrir panne-tchap \
+            "Canal d'alerte Tchap hors service" \
+            "@${{ github.repository_owner }} — le compte robot ne peut plus poster dans le salon Tchap d'alerte (jeton expiré, compte non renouvelé ou robot sorti du salon).
+
+          Les alertes continuent d'arriver par ticket GitHub. Voir le journal de l'étape « Vérifier le canal Tchap » : $EXECUTION"
+
+      - name: Fermer le ticket si le canal Tchap répond
+        if: steps.tchap.outcome == 'success'
+        run: |
+          bash .github/alerte.sh fermer panne-tchap "Canal Tchap opérationnel : $EXECUTION"

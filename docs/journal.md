@@ -290,6 +290,17 @@ tâche planifiée se noie. C'est la vraie cause de la récidive.
    reste visible tant que dure la panne. Supervision alerte dès le premier
    échec, sans attendre les 48 heures de la vigie.
 
+**Complément du même jour — Tchap plutôt que Slack.** L'équipe n'utilise
+plus Slack ; l'étape Slack de la vigie est retirée. Tchap n'offre pas de webhook
+entrant : la voie documentée est un compte utilisateur dédié au robot, qui
+poste par l'API client de Matrix (`.github/tchap.py`). Le ticket reste le canal
+de référence, Tchap s'y ajoute. Un compte Tchap expire faute de renouvellement
+périodique : la vigie vérifie donc chaque jour, sans rien poster, que le jeton
+est valide et le robot membre du salon, et ouvre un ticket `panne-tchap`
+sinon — pour que le canal d'alerte ne puisse pas, lui non plus, tomber en
+silence. Le compte robot doit être distinct de celui du destinataire : Matrix
+ne notifie pas ses propres messages.
+
 ---
 
 ## Surprises sur les données

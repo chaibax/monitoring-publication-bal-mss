@@ -18,8 +18,18 @@
 #
 # Requiert GH_TOKEN (le jeton du workflow suffit, avec `issues: write`) et
 # GITHUB_REPOSITORY.
+#
+# Chaque ouverture et chaque fermeture est aussi poussée sur Tchap si le canal
+# est configuré (voir .github/tchap.py). Le ticket reste le canal de référence :
+# un envoi Tchap manqué n'empêche ni ne masque le ticket, et la vigie contrôle
+# chaque jour que le canal Tchap répond encore.
 
 set -euo pipefail
+
+tchap() {
+  python3 "$(dirname "$0")/tchap.py" envoyer "$1" \
+    || echo "::warning::Envoi Tchap manqué — le ticket GitHub reste ouvert et notifié."
+}
 
 action=$1
 etiquette=$2
@@ -39,7 +49,10 @@ case "$action" in
       echo "Ticket #$ouvert déjà ouvert pour « $etiquette » — rien de plus."
       exit 0
     fi
-    gh issue create --repo "$depot" --label "$etiquette" --title "$titre" --body "$corps"
+    lien=$(gh issue create --repo "$depot" --label "$etiquette" --title "$titre" --body "$corps")
+    echo "$lien"
+    tchap "🔴 Supervision BAL MSSanté — $titre
+$lien"
     ;;
   fermer)
     commentaire=$3
@@ -48,6 +61,8 @@ case "$action" in
       exit 0
     fi
     gh issue close "$ouvert" --repo "$depot" --comment "$commentaire"
+    tchap "🟢 Supervision BAL MSSanté — rétabli ($etiquette).
+$commentaire"
     ;;
   *)
     echo "usage : alerte.sh ouvrir|fermer <étiquette> …" >&2
