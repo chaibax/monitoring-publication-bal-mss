@@ -52,6 +52,12 @@ def _contexte_tls():
     return contexte
 
 
+class RefusTchap(Exception):
+    def __init__(self, code, corps):
+        super().__init__(f"{code} : {corps}")
+        self.code, self.corps = code, corps
+
+
 def _json(url, corps=None):
     requete = urllib.request.Request(
         url, data=json.dumps(corps).encode() if corps else None,
@@ -61,28 +67,54 @@ def _json(url, corps=None):
         with urllib.request.urlopen(requete, timeout=30, context=_contexte_tls()) as reponse:
             return json.load(reponse)
     except urllib.error.HTTPError as erreur:
-        sys.exit(f"Refus de Tchap ({erreur.code}) : {erreur.read().decode(errors='replace')[:300]}")
+        raise RefusTchap(erreur.code, erreur.read().decode(errors="replace")[:300]) from None
     except urllib.error.URLError as erreur:
         sys.exit(f"Tchap injoignable : {erreur.reason}")
+
+
+def _connexion(serveur, identifiant, mot_de_passe):
+    return _json(f"{serveur}/_matrix/client/v3/login", {
+        "type": "m.login.password",
+        "identifier": {"type": "m.id.user", "user": identifiant},
+        "password": mot_de_passe,
+        "initial_device_display_name": "supervision-bal-mss (GitHub Actions)",
+    })
 
 
 def main():
     sys.stderr.write("Adresse e-mail du compte robot Tchap : ")
     sys.stderr.flush()
     adresse = sys.stdin.readline().strip()
-    hs = _json(f"{ANNUAIRE}?{urllib.parse.urlencode({'medium': 'email', 'address': adresse})}").get("hs")
+    try:
+        hs = _json(f"{ANNUAIRE}?{urllib.parse.urlencode({'medium': 'email', 'address': adresse})}").get("hs")
+    except RefusTchap as refus:
+        sys.exit(f"Refus de Tchap ({refus})")
     if not hs:
         sys.exit(f"Aucun serveur Tchap pour {adresse}.")
     serveur = f"https://matrix.{hs}"
     print(f"Serveur du robot : {serveur}", file=sys.stderr)
 
+    # Le service d'authentification de Tchap (MAS) n'accepte pas l'adresse
+    # e-mail comme identifiant de connexion, seulement l'identifiant Matrix.
+    # Tchap le dérive de l'adresse : « @ » devient « - ».
+    identifiant = f"@{adresse.lower().replace('@', '-')}:{hs}"
+    print(f"Identifiant Matrix supposé : {identifiant}", file=sys.stderr)
+
     mot_de_passe = getpass.getpass("Mot de passe du compte robot : ")
-    session = _json(f"{serveur}/_matrix/client/v3/login", {
-        "type": "m.login.password",
-        "identifier": {"type": "m.id.thirdparty", "medium": "email", "address": adresse},
-        "password": mot_de_passe,
-        "initial_device_display_name": "supervision-bal-mss (GitHub Actions)",
-    })
+    try:
+        session = _connexion(serveur, identifiant, mot_de_passe)
+    except RefusTchap as refus:
+        if refus.code != 403:
+            sys.exit(f"Refus de Tchap ({refus})")
+        sys.stderr.write(
+            "Tchap refuse cet identifiant ou ce mot de passe. Si le mot de passe est bon,\n"
+            "saisissez l'identifiant Matrix exact du robot (Tchap > Paramètres, « @…:… ») : ")
+        sys.stderr.flush()
+        identifiant = sys.stdin.readline().strip()
+        try:
+            session = _connexion(serveur, identifiant, mot_de_passe)
+        except RefusTchap as refus:
+            sys.exit(f"Refus de Tchap ({refus})")
     del mot_de_passe
 
     subprocess.run(["gh", "secret", "set", "TCHAP_ACCESS_TOKEN", "--repo", DEPOT],
