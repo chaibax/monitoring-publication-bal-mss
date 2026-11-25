@@ -31,15 +31,32 @@ tchap() {
     || echo "::warning::Envoi Tchap manqué — le ticket GitHub reste ouvert et notifié."
 }
 
+SITE=https://monitoring-publication-bal-mss.netlify.app
+SOURCE=https://www.data.gouv.fr/datasets/annuaire-sante-extraction-des-bal-mssante-format-zip
+
+# Le service concerné par chaque type de panne, repris dans chaque message :
+# la personne alertée doit pouvoir aller voir d'un clic ce qui ne répond plus.
+service_concerne() {
+  case "$1" in
+    panne-collecte) echo "Service concerné : source $SOURCE — site $SITE" ;;
+    panne-vigie)    echo "Service concerné : site $SITE" ;;
+    panne-tchap)    echo "Service concerné : salon Tchap d'alerte (compte robot)" ;;
+    *)              echo "Service concerné : $SITE" ;;
+  esac
+}
+
 action=$1
 etiquette=$2
+service=$(service_concerne "$etiquette")
 depot=${GITHUB_REPOSITORY:?}
 
 gh label create "$etiquette" --repo "$depot" --color B60205 \
   --description "Panne de l'outil de supervision (ticket automatique)" --force >/dev/null
 
-ouvert=$(gh issue list --repo "$depot" --label "$etiquette" --state open \
-  --json number --jq '.[0].number // empty')
+ticket=$(gh issue list --repo "$depot" --label "$etiquette" --state open \
+  --json number,url,title --jq '.[0] // empty')
+ouvert=""
+if [ -n "$ticket" ]; then ouvert=$(jq -r .number <<<"$ticket"); fi
 
 case "$action" in
   ouvrir)
@@ -49,10 +66,14 @@ case "$action" in
       echo "Ticket #$ouvert déjà ouvert pour « $etiquette » — rien de plus."
       exit 0
     fi
-    lien=$(gh issue create --repo "$depot" --label "$etiquette" --title "$titre" --body "$corps")
+    lien=$(gh issue create --repo "$depot" --label "$etiquette" --title "$titre" \
+      --body "$corps
+
+$service")
     echo "$lien"
     tchap "🔴 Supervision BAL MSSanté — $titre
-$lien"
+$service
+Ticket : $lien"
     ;;
   fermer)
     commentaire=$3
@@ -61,7 +82,9 @@ $lien"
       exit 0
     fi
     gh issue close "$ouvert" --repo "$depot" --comment "$commentaire"
-    tchap "🟢 Supervision BAL MSSanté — rétabli ($etiquette).
+    tchap "🟢 Supervision BAL MSSanté — rétabli : $(jq -r .title <<<"$ticket")
+$service
+Ticket : $(jq -r .url <<<"$ticket")
 $commentaire"
     ;;
   *)

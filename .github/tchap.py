@@ -70,11 +70,13 @@ def envoyer(texte):
 
 def verifier():
     serveur, salon, jeton = _configuration()
-    moi = _appel("GET", f"{serveur}/_matrix/client/v3/account/whoami", jeton)["user_id"]
+    # L'identifiant du robot n'est jamais écrit : les journaux d'un dépôt public
+    # sont lisibles par tous, et sur Tchap il contient l'adresse e-mail du compte.
+    _appel("GET", f"{serveur}/_matrix/client/v3/account/whoami", jeton)
     salons = _appel("GET", f"{serveur}/_matrix/client/v3/joined_rooms", jeton)["joined_rooms"]
     if salon not in salons:
-        raise SystemExit(f"Le compte {moi} n'est pas membre du salon {salon}.")
-    print(f"Canal Tchap opérationnel : {moi} est membre du salon.")
+        raise SystemExit("Le compte robot n'est pas membre du salon d'alerte.")
+    print("Canal Tchap opérationnel : le compte robot est membre du salon.")
 
 
 def main(arguments):
