@@ -20,6 +20,11 @@ on:
   schedule:
     - cron: '40 9 * * *'
   workflow_dispatch:
+    inputs:
+      essai_tchap:
+        description: "Poster un message d'essai dans le salon Tchap d'alerte"
+        type: boolean
+        default: false
 
 jobs:
   fraicheur:
@@ -153,6 +158,11 @@ jobs:
         id: tchap
         continue-on-error: true
         run: python3 .github/tchap.py verifier
+
+      - name: Poster un message d'essai sur Tchap
+        if: inputs.essai_tchap && steps.tchap.outcome == 'success'
+        run: |
+          python3 .github/tchap.py envoyer "🧪 Supervision BAL MSSanté — message d'essai du canal d'alerte. Les pannes de l'outil arriveront ici (🔴 à l'ouverture, 🟢 au rétablissement). $EXECUTION"
 
       - name: Ouvrir un ticket si le canal Tchap ne répond plus
         if: steps.tchap.outcome == 'failure'
