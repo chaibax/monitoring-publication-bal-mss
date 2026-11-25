@@ -23,6 +23,8 @@ Requiert `gh` authentifié sur le dépôt.
 
 import getpass
 import json
+import os
+import ssl
 import subprocess
 import sys
 import urllib.error
@@ -33,16 +35,35 @@ DEPOT = "chaibax/monitoring-publication-bal-mss"
 ANNUAIRE = "https://matrix.agent.dinum.tchap.gouv.fr/_matrix/identity/api/v1/info"
 
 
+def _contexte_tls():
+    """Le Python de python.org sur macOS est livré sans magasin de certificats,
+    et le fichier /etc/ssl/cert.pem de macOS est trop ancien pour connaître la
+    racine HARICA des serveurs Tchap. Sur macOS, on charge donc les racines du
+    trousseau système, celles qu'utilise le navigateur ; ailleurs, le magasin
+    du système suffit."""
+    contexte = ssl.create_default_context(cafile=os.environ.get("SSL_CERT_FILE"))
+    if sys.platform == "darwin":
+        racines = subprocess.run(
+            ["security", "find-certificate", "-a", "-p",
+             "/System/Library/Keychains/SystemRootCertificates.keychain"],
+            capture_output=True, text=True, check=True,
+        ).stdout
+        contexte.load_verify_locations(cadata=racines)
+    return contexte
+
+
 def _json(url, corps=None):
     requete = urllib.request.Request(
         url, data=json.dumps(corps).encode() if corps else None,
         headers={"Content-Type": "application/json"},
     )
     try:
-        with urllib.request.urlopen(requete, timeout=30) as reponse:
+        with urllib.request.urlopen(requete, timeout=30, context=_contexte_tls()) as reponse:
             return json.load(reponse)
     except urllib.error.HTTPError as erreur:
         sys.exit(f"Refus de Tchap ({erreur.code}) : {erreur.read().decode(errors='replace')[:300]}")
+    except urllib.error.URLError as erreur:
+        sys.exit(f"Tchap injoignable : {erreur.reason}")
 
 
 def main():
