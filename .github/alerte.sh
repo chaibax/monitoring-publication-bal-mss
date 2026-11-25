@@ -38,7 +38,7 @@ SOURCE=https://www.data.gouv.fr/datasets/annuaire-sante-extraction-des-bal-mssan
 # la personne alertée doit pouvoir aller voir d'un clic ce qui ne répond plus.
 service_concerne() {
   case "$1" in
-    panne-collecte) echo "Service concerné : source $SOURCE — site $SITE" ;;
+    panne-collecte|essai-alerte) echo "Service concerné : source $SOURCE — site $SITE" ;;
     panne-vigie)    echo "Service concerné : site $SITE" ;;
     panne-tchap)    echo "Service concerné : salon Tchap d'alerte (compte robot)" ;;
     *)              echo "Service concerné : $SITE" ;;

@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
     inputs:
       essai_tchap:
-        description: "Poster un message d'essai dans le salon Tchap d'alerte"
+        description: "Essai complet d'alerte : ticket et messages Tchap 🔴 puis 🟢"
         type: boolean
         default: false
 
@@ -159,10 +159,15 @@ jobs:
         continue-on-error: true
         run: python3 .github/tchap.py verifier
 
-      - name: Poster un message d'essai sur Tchap
+      # Essai de bout en bout : le vrai chemin d'alerte, ticket compris, ouvert
+      # puis refermé aussitôt. Deux messages sur Tchap, 🔴 puis 🟢.
+      - name: Essai complet d'alerte
         if: inputs.essai_tchap && steps.tchap.outcome == 'success'
         run: |
-          python3 .github/tchap.py envoyer "🧪 Supervision BAL MSSanté — message d'essai du canal d'alerte. Les pannes de l'outil arriveront ici (🔴 à l'ouverture, 🟢 au rétablissement). $EXECUTION"
+          bash .github/alerte.sh ouvrir essai-alerte \
+            "ESSAI — exemple d'alerte, aucune panne réelle" \
+            "@${{ github.repository_owner }} — ceci est un essai du canal d'alerte, déclenché à la main. Aucune panne en cours. Ce ticket se ferme immédiatement."
+          bash .github/alerte.sh fermer essai-alerte "Fin de l'essai : $EXECUTION"
 
       - name: Ouvrir un ticket si le canal Tchap ne répond plus
         if: steps.tchap.outcome == 'failure'
