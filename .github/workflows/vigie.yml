@@ -167,6 +167,9 @@ jobs:
           bash .github/alerte.sh ouvrir essai-alerte \
             "ESSAI — exemple d'alerte, aucune panne réelle" \
             "@${{ github.repository_owner }} — ceci est un essai du canal d'alerte, déclenché à la main. Aucune panne en cours. Ce ticket se ferme immédiatement."
+          # La liste des tickets ne voit un ticket neuf qu'au bout de quelques
+          # secondes : sans pause, la fermeture ne le trouverait pas.
+          sleep 20
           bash .github/alerte.sh fermer essai-alerte "Fin de l'essai : $EXECUTION"
 
       - name: Ouvrir un ticket si le canal Tchap ne répond plus
